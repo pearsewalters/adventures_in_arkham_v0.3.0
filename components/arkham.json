@@ -1,0 +1,128 @@
+{   
+    "streets" : {
+        "Southside Streets" : {
+            "name" : "Southside Streets",
+            "neighborhood" : "Southside",
+            "neighbors" : [
+                "French Hill Streets",
+                "Uptown Streets",
+                "Ma\"s Boarding House",
+                "South Church",
+                "Historical Society"
+            ],
+            "inhabitants" : [],
+            "activity" : false
+        },
+        "Uptown Streets" : {
+            "name" : "Uptown Streets",
+            "neighborhood" : "Uptown",
+            "neighbors" : [
+                "Miskatonic University Streets",
+                "Southside Streets",
+                "St. Mary\"s Hopsital",
+                "Ye Olde Magick Shoppe",
+                "Woods"
+            ],
+            "inhabitants" : [],
+            "activity" : false
+        }
+    },
+    "locations" : {
+        "Ye Olde Magick Shoppe" : {
+            "name" : "Ye Olde Magick Shoppe",
+            "neighborhood" : "Uptown",
+            "neighbors" : [
+                "Uptown Streets"
+            ],
+            "encounters" : {},
+            "inhabitants" : [],
+            "closed" : false,
+            "stable" : true,
+            "clues" : 0,
+            "gate" : false,
+            "gate_to" : null,
+            "explored" : false,
+            "sealed" : false
+        },
+        "Historical Society" : {
+            "name" : "Historical Society",
+            "neighborhood" : "Southside",
+            "neighbors" : [
+                "Southside Streets"
+            ],
+            "encounters" : {},
+            "inhabitants" : [],
+            "closed" : false,
+            "stable" : false,
+            "clues" : 1,
+            "gate" : false,
+            "gate_to" : null,
+            "explored" : false,
+            "sealed" : false
+        },
+        "Library" : {
+            "name" : "Library",
+            "neighborhood" : "Miskatonic University",
+            "neighbors" : [
+                "Miskatonic University Streets"
+            ],
+            "encounters" : {},
+            "inhabitants" : [],
+            "closed" : false,
+            "stable" : true,
+            "clues" : 0,
+            "gate" : false,
+            "gate_to" : null,
+            "explored" : false,
+            "sealed" : false
+        },
+        "Administration" : {
+            "name" : "Administration",
+            "neighborhood" : "Miskatonic University",
+            "neighbors" : [
+                "Miskatonic University Streets"
+            ],
+            "encounters" : {},
+            "inhabitants" : [],
+            "closed" : false,
+            "stable" : true,
+            "clues" : 0,
+            "gate" : false,
+            "gate_to" : null,
+            "explored" : false,
+            "sealed" : false
+        },
+        "General Store" : {
+            "name" : "General Store",
+            "neighborhood" : "Rivertown",
+            "neighbors" : [
+                "Rivertown Streets"
+            ],
+            "encounters" : {},
+            "inhabitants" : [],
+            "closed" : false,
+            "stable" : true,
+            "clues" : 0,
+            "gate" : false,
+            "gate_to" : null,
+            "explored" : false,
+            "sealed" : false
+        },
+        "Curiositie Shoppe" : {
+            "name" : "Curiositie Shoppe",
+            "neighborhood" : "Downtown",
+            "neighbors" : [
+                "Downtown Streets"
+            ],
+            "encounters" : {},
+            "inhabitants" : [],
+            "closed" : false,
+            "stable" : true,
+            "clues" : 0,
+            "gate" : false,
+            "gate_to" : null,
+            "explored" : false,
+            "sealed" : false
+        }
+    }
+}

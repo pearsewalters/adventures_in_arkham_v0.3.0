@@ -1,0 +1,215 @@
+
+
+
+DATA SOURCES
+
+- Investigators
+    - Health Status ✔︎
+        - Maximum Damage: int
+        - Current Damage: int
+        - Consciousness: {0, 1}
+        - Maximum Horror: int
+        - Current Horror: int
+        - Sanity: {0, 1}
+    - Condition ✔︎
+        - Arrested: {0, 1}
+        - Delayed: {0, 1}
+        - Lost in Time & Space: {0, 1}
+        - Blessed/Cursed: {-1, 0, 1}
+    - Locational ✔︎
+        - Current location: str
+        - Home location: str
+        - In Arkham: bool
+        - Lost in Time & Space: bool
+    - Inventory ✔︎
+        - Clues: int
+        - Money: int
+        - Common Items: list[ str ]
+        - Unique Items: list[ str ]
+        - Spells: list[ str ]
+        - Equipped Items: list[ str ]
+        - Exhausted Items: list[ str ]
+        - Available Hands: int
+        - Passive Buffs: list
+        - Active Buffs: list
+    - Skills ✔︎
+        - Focus: int
+        - Maximum Speed: int
+        - Default Speed: int
+        - Speed/Sneak Sum: int
+        - Maximum Fight: int
+        - Default Fight: int
+        - Fight/Will Sum: int
+        - Maximum Lore: int
+        - Default Lore: int
+        - Lore/Luck Sum: int        
+    - Random Inventory
+        - Clues: int
+        - Money: int
+        - Common Items: int
+        - Unique Items: int
+        - Spells: int
+        - Buffs (Skills): int
+    
+
+HEALTH STATUS 
+
+# [ 5, 0, 0 ] represents a character's stamina status
+# max damage := 5, default damage := 0, unconscious := 0
+# [ 5, 0, 0 ] represents a character's sanity status
+# max horror := 5, default horror := 0, insane := 0
+
+# transformers
+inc_stat( matrix ) -> matrix
+dec_stat( matrix ) -> matrix
+get_current_stat( matrix, transformations ) -> matrix 
+
+# validators
+damage_rule( matrix, next_transform, prev_transforms ) -> { 0, 1, 2 }
+    0 := invalid transform 
+    1 := valid transform, investigator conscious
+    2 := valid transform, investigator unconscious
+sanity_rule( matrix, next_transform, prev_transforms ) -> { 0, 1, 2 }
+    0 := invalid transform 
+    1 := valid transform, investigator sane
+    2 := valid transform, investigator insane
+unconscious_rule( matrix, next_transform, prev_transforms ) -> bool
+    True := valid transform (value is either 0 or 1)
+    False := invalid transform (value is anything else)
+insane_rule( matrix, next_transform, prev_transforms ) -> bool
+    True := valid transform (value is either 0 or 1)
+    False := invalid transform (value is anything else)
+
+CONDITIONS
+
+[ 0, 0, 0, 0 ] represents an investigator's current conditions
+delayed := 0, arrested := 0, lost in time & space := 0, blessed/cursed := 0
+delayed, arrested, and lost in time & space exist in {0, 1}, 0 is false, 1 is true
+blessed/cursed is in {-1, 0, 1} where -1 is cursed, 1 is blessed, and 0 is neither
+
+
+LOCATIONAL
+
+The validator that handles current location transformations has a local copy of the map of Arkham, which is a matrix:
+
+[ 
+    [ None, 'A', 'B', 'C', ... ],
+    [ 'A',   1,   1,   0,  ... ],
+    [ 'B',   1,   1,   1,  ... ],
+    [ 'C',   0,   1,   1,  ... ],
+    ...
+]
+Here we have represented at least 3 locations, A, B, and C and their adjacency. On a graph, A shares an edges with B, which 
+    shares an edges with C. A and C do not share an edge, and each location is assumed to be self-adjacent:
+
+A -- B -- C
+
+Row 0 is the headers row. Row 1-N are each unique locations, and every column is an adjacency score; 0 := not adjacent, 
+    and 1 := adjacent. 
+Investigator locational data represents current location as a number that corresponds to a row in the matrix. 
+There exists some transformation that takes in a locational data matrix for a given Character, and transforms the current 
+    location (the row) into a new one (a column). 
+The validator then only needs to ask if the current row has marked the column as a 0 or a 1, and return False or True respectively.
+There is a None value at [0][0] to offset the rows and columns appropriately.
+
+This is a redundant representation, since it is symmetric across the diagonal. However, this will actually be convenient because it
+    will allow me to skip the step of converting questions into their converse. That is, if A is adjacent to B, then due to the symmetry
+    of the matrix, we know that B is adjacent to A. Both is_adjacent(A,B) and is_adjacent(B, A) both return True through the same logic 
+    without the added complexity of converting B->A into A->B. The information for both statements is in the matrix. 
+
+Investigator locational data looks like this: [ N, M, A ], where N := current location as a natural number representing a row in the 
+    matrix above, M := movement points available to the Investigator, and A := in Arkham, existing in {0,1} where 1 is in Arkham, and 0
+    is not in Arkham.
+
+SKILLS
+# python code
+
+# represent speed slider [ 2, 3, 4, 5 ] and sneak slider [ 3, 2, 1, 0 ]
+# max speed := 5, default speed := 4, speed + sneak := 5
+skills = { 
+    'focus' : 2
+}
+skills['speed'] = skills['sneak'] = [ 4, 4, 5 ]
+skills['fight'] = skills['will'] = [ 4, 4, 5 ]
+skills['lore'] = skills['luck'] = [ 4, 4, 5 ]
+    
+transforms = { 
+    'focus' : [ ]
+}
+transforms['speed'] = transforms['sneak'] = [  ]
+transforms['fight'] = transforms['will'] = [  ]
+transforms['lore'] = transforms['luck'] = [  ]
+
+# need a way to increase speed / decrease sneak
+# matrix[0] -> maximum value for that skill
+# matrix[0]-3 -> minimum value for that skill
+# matrix[1] -> default skill
+# size of the cycle := 4
+# the effect of this expression is to give the next value in a range [ max-3, max-2, max-1, max ], where max+1 == max-3
+>>> def inc_skill( matrix ):
+...     return [ matrix[0], (matrix[1]-(matrix[0]-3)+(1%4) + 4) % 4 + (matrix[0]-3), matrix[2] ]
+
+# same as above, but to decrease speed / increase sneak
+# notice (-1%4) evaluates to (3), effectively giving the previous value in a range [ max-3, max-2, max-1, max ], where (max-3)-1 == max
+>>> def dec_skill( matrix ):
+...     return [ matrix[0], (matrix[1]-(matrix[0]-3)+(-1%4) + 4) % 4 + (matrix[0]-3), matrix[2] ]
+
+# getting current skill looks like composing all of the transformations of the default matrix one after another
+>>> def get_current_skill( matrix: list , transformations: list ) -> int:
+...     m = matrix
+...     for transformation in transformations:
+...         m = transformation( m )
+...     return m[1]
+# getting the complement just means subtracting the return value of get_current_skill from the skill pair's sum
+>>> def get_current_complement_skill( matrix: list, transformations: list ) -> int:
+...     return matrix[2] - get_current_skill( matrix, transformations )
+
+# alias functions to make them more descriptive and note that we now have a way to do any of the 3 skill pairs
+>>> inc_speed, dec_speed = inc_skill, dec_skill
+>>> inc_sneak, dec_sneak = dec_skill, inc_skill
+>>> get_current_speed, get_current_sneak = get_current_skill, get_current_complement_skill
+
+Functions inc_fight, dec_fight, inc_will, dec_will, inc_lore, dec_lore, inc_luck, dec_luck are all similarly aliases for inc_skill and dec skill.
+In addition, get_current_fight, get_current_will, get_current_lore, get_current_luck are also aliases for get_current_skill and get_current_complement_skill.
+
+See skills_adjust_test.py for implementation example
+
+
+POSSESSIONS
+
+Random possessions are represented as a list of numbers, such as [ 1, 1, 1, 2 ],
+    representing [ common items, unique items, spells, skills ] respectively. This Will
+    be utilized by the setup procedure that gives characters their starting items.
+Equipped items are represented by a list, such as [ 2, [] ], representing [ hands, items ].
+    This is where the procedure that handles combat will look to get weapon and spell bonuses.
+Possessions are represented by a dict: 
+    
+    { 'money' : 0,
+    'clues' : 0,
+    'gate_trophies' : 0,
+    'monster_trophies' : 0, 
+    'common' : [],
+    'unique' : [],
+    'spells' : [],
+    'buffs' : [] }
+
+    This dict is copied by a function copy_of_possessions( possessions ) that returns a new dict,
+    so as to prevent any back-mutation on the default.
+
+    Common, Unique, and Spells are each lists that contain the items that the Character possesses.
+    Buffs are included in possessions. However, this version of the game is only going to offer
+    passive buffs that won't disappear when a Character becomes unconscious, insane, or lost in time & space.
+
+Storing transforms and getting current possessions will be different than, for example, getting current damage.
+    Since adding & removing items requires both the dictionary to be transformed and the item to added or removed,
+    the transformation list includes both the transform and any arguments given, packed in a tuple. For instance:
+
+    transforms = [ (add_common_item, 'knife'), (remove_common_item, 'spoon') ]
+
+    The get_current function will have all of the necessary components to rebuild the current state of possessions.
+
+Buffs are 
+
+
+
+

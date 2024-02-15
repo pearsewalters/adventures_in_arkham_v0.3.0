@@ -1,0 +1,12 @@
+name,casting_modifier,sanity_cost,hands,effect,frequency
+Bind Monster,4,2,2,Any: Cast and Discard this spell to pass one Combat check. You must roll successes equal to the monster's toughness to cast this spell. This spell doesn't work on Ancient Ones.,2
+Dread Curse of Azathoth,-2,2,2,Any: Cast and exhaust to gain +9 to Combat checks until the end of this combat.,4
+Enchant Weapon,0,1,null,Cast and exhaust to make one Physical weapon a Magical weapon until the end of this combat.,3
+Find Gate,1,1,null,Cast and exhaust to immediately return to Arkham from an Other World.,4
+Flesh Ward,-2,1,null,Cast and exhaust to ignore all Stamina loss being dealt to you from one source. Discard this spell if the Ancient One awakens.,4
+Heal,1,1,null,Upkeep Phase: You may cast and exhaust. You or another investigator in your area gains Stamina equal to the successes you rolled on your Spell check. This Stamina cannot be split between multiple investigators.,3
+Mists of Releh,Special,0,null,Any Phase: Cast and exhaust to pass an Evade check. The casting modifier is equal to the monster's Awareness.,4
+Red Sign of Shudde M'ell,-1,1,1,Any: Cast and exhaust to lower a monster's toughness by 1 (to a minimum of 1) and ignore one of its special abilities other than Magical Immunity until the end of this combat.,2
+Shrivelling,-1,1,1,Any Phase: Cast and exhaust to gain +6 to Combat checks until the end of this combat.,5
+Voice of Ra,-1,1,null,Upkeep Phase: You may cast and exhaust to gain +1 to all skill checks for the rest of this turn.,3
+Wither,0,0,1,Cast and exhaust to gain +3 to Combat checks until the end of this combat.,6

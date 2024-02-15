@@ -1,0 +1,23 @@
+name,variety,price,frequency,bonus,description,hands,exhaustable,losable,clarification,corrections
+.18 Derringer,physical weapon,3,2,+2 to Combat checks,.18 Derringer cannot be lost or stolen unless you choose to allow it.,1,FALSE,FALSE,null,null
+.38 Revolver,physical weapon,4,2,+3 to Combat checks,null,1,FALSE,TRUE,null,null
+.45 Automatic,physical weapon,5,2,+4 to Combat checks,null,1,FALSE,TRUE,null,null
+Ancient Tome,tome,4,2,null,"Movement: Exhaust and spend 2 movement points to make a Lore(-1) check. If you pass, draw 1 Spell annd discard Ancient Tome. If you fail, nothing happens.",null,TRUE,TRUE,null,null
+Axe,physical weapon,3,2,+2 to Combat checks (+3 if your other hand is empty).,null,1,FALSE,TRUE,null,null
+Bullwhip,physical weapon,2,2,+1 to Combat checks,Any: Exhaust to re-roll 1 die after making a Combat check,1,TRUE,TRUE,You do not need to devote hands to use this card's special ability.,null
+Cavalry Saber,physical weapon,3,2,+2 to Combat checks,null,1,FALSE,TRUE,null,null
+Cross,magical weapon,3,2,+0 to Combat checks (+3 if Opponent is Undead). +1 to Horror Checks,null,1,FALSE,TRUE,The Cross does not need to be equipped to receive the bonus to Horror Checks. It is always active.,null
+Dark Cloak,passive buff,2,2,+1 to Evade Checks,null,null,FALSE,TRUE,null,null
+Dynamite,physical weapon,4,2,+8 to Combat checks (Discard after use).,null,2,FALSE,TRUE,null,null
+Food,consumable,1,2,null,Discard Food to reduce any Stamina loss by 1,null,FALSE,TRUE,null,null
+Knife,physical weapon,2,2,+1 to Combat checks,null,1,FALSE,TRUE,null,null
+Lantern,passive buff,3,2,+1 to Luck checks,null,null,FALSE,TRUE,null,"The original card featured more complicated text (""Any Phase: Exhaust to re-roll 1 die after making a Luck check."") and specified a lower cost ($2)."
+Lucky Cigarette Case,consumable,1,2,null,Any: Discard Lucky Cigarette Case to re-roll any one Skill Check,null,FALSE,TRUE,null,null
+Map of Arkham,active buff,2,2,null,Movement: Exhaust to get 1 extra movement point,null,TRUE,TRUE,Cannot use in Other Worlds,null
+Motorcycle,active buff,4,2,null,Movement: Exhaust to get 2 extra movement points,null,TRUE,TRUE,Cannot use in Other Worlds,null
+Old Journal,tome,1,2,null,"Movement: Exhaust and spend 1 movement point to make a Lore(-1) check. If you pass, you gain 3 Clue Tokens annd discard Old Journal. If you fail, nothing happens.",null,TRUE,TRUE,null,null
+Research Materials,consumable,1,2,null,Any: Discard Research Materials instead of spending 1 Clue Token,null,FALSE,TRUE,null,null
+Rifle,physical weapon,6,2,+5 to Combat checks,null,2,FALSE,TRUE,null,null
+Shotgun,physical weapon,6,2,+4 to Combat checks,"Any: When using Shotgun in Combat, all 6s rolled count as 2 successes.",2,FALSE,TRUE,null,null
+Tommy Gun,physical weapon,7,2,+6 to Combat checks,null,2,FALSE,TRUE,null,null
+Whiskey,consumable,1,2,null,Any: Discard Whiskey to reduce any Sanity loss by 1.,null,FALSE,TRUE,null,null

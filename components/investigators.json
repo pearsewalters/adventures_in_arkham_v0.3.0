@@ -1,0 +1,129 @@
+{
+    "am_sh" : {
+        "name" : "Amanda Sharpe",
+        "occupation" : "the Student",
+        "home" : "Library",
+        "location_current" : "Library",
+        "sanity_current" : 5,
+        "sanity_max" : 5,
+        "stamina_current" : 5,
+        "stamina_max" : 5,
+        "possessions" : {
+            "money" : 1,
+            "clues" : 1,
+            "common" : [],
+            "unique" : [],
+            "spells" : [],
+            "allies" : [],
+            "skills" : [],
+            "gate_trophies" : 0,
+            "monster_trophies" : 0
+        },
+        "random_possessions" : {
+            "common" : 1,
+            "unique" : 1,
+            "spells" : 1,
+            "skills" : 2
+        },
+        "focus_current" : 3,
+        "focus_max" : 3,
+        "natural_skills_current" : {
+            "speed" : 3,
+            "sneak" : 2,
+            "fight" : 3,
+            "will" : 2,
+            "lore" : 3,
+            "luck" : 2
+        },
+        "natural_skills_tracks" : {
+            "speed" : [1,2,3,4],
+            "sneak" : [4,3,2,1],
+            "fight" : [1,2,3,4],
+            "will" : [4,3,2,1],
+            "lore" : [1,2,3,4],
+            "luck" : [4,3,2,1]
+        },
+        "in_arkham" : true,
+        "delayed" : false,
+        "lost_in_time_and_space" : false,
+        "blessed" : false,
+        "cursed" : false,
+        "unconscious" : false,
+        "insane" : false,
+        "devoured" : false,
+        "bank_loan" : false,
+        "deputy_of_arkham" : false,
+        "retainer" : false,
+        "special" : {
+            "variety" : "deck_diver",
+            "active" : false,
+            "name" : "Studious",
+            "desc" : "Whenever Amanda draws one or more cards from the Skill deck, she draws one extra card and then discards one of the cards.",
+            "func" :  null,
+            "args" : [ "skills" ]
+        }
+    },
+    "ha_wa" : {
+        "name" : "Harvey Walters",
+        "occupation" : "the Professor",
+        "home" : "Administration",
+        "location_current" : "Administration",
+        "sanity_current" : 7,
+        "sanity_max" : 7,
+        "stamina_current" : 3,
+        "stamina_max" : 3,
+        "possessions" : {
+            "money" : 5,
+            "clues" : 1,
+            "common" : [],
+            "unique" : [],
+            "spells" : [],
+            "allies" : [],
+            "skills" : [],
+            "gate_trophies" : 0,
+            "monster_trophies" : 0
+        },
+        "random_possessions" : {
+            "common" : 0,
+            "unique" : 2,
+            "spells" : 2,
+            "skills" : 1
+        },
+        "focus_current" : 3,
+        "focus_max" : 3,
+        "natural_skills_current" : {
+            "speed" : 3,
+            "sneak" : 2,
+            "fight" : 3,
+            "will" : 2,
+            "lore" : 3,
+            "luck" : 2
+        },
+        "natural_skills_tracks" : {
+            "speed" : [0,1,2,3],
+            "sneak" : [5,4,3,2],
+            "fight" : [0,1,2,3],
+            "will" : [3,2,1,0],
+            "lore" : [3,4,5,6],
+            "luck" : [4,3,2,1]
+        },
+        "in_arkham" : true,
+        "delayed" : false,
+        "lost_in_time_and_space" : false,
+        "blessed" : false,
+        "cursed" : false,
+        "unconscious" : false,
+        "insane" : false,
+        "devoured" : false,
+        "bank_loan" : false,
+        "deputy_of_arkham" : false,
+        "retainer" : false,
+        "special" : {
+            "variety" : "damage_reducer",
+            "name" : "Strong Mind",
+            "desc" : "Any Phase: Harvey reduces all Sanity losses he suffers by 1, to a minimum of 0.",
+            "func" :  null,
+            "args" : [ "sanity" ]
+        }
+    }
+}

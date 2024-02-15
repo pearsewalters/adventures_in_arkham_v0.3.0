@@ -1,0 +1,9 @@
+name,title,combat_rating,defenses,worshippers,power,attack,doom_track
+Azathoth,the Daemon Sultan,-infinity,null,"{'description': 'Since Azathoth promises nothing except destruction, only the insane worship him. However, their fanaticism gives them strength. Maniacs have their toughness increased by 1.'}","{'title': 'Absolute Desctruction', 'description': 'If Azathoth awakens, the game is over and the investigators lose.'}",{'description': 'The end is here! Azathoth destroys the world.'},"{'maximum': 14, 'current': 0}"
+Cthulhu,the Dreamer,null,null,null,null,null,null
+Hastur,the King in Yellow,null,null,null,null,null,null
+Ithaqua,the Wind-Walker,null,null,null,null,null,null
+Nyarlathotep,the God of a Thousand Masks,null,null,null,null,null,null
+Shub Niggurath,the Black Goat of the Woods,null,null,null,null,null,null
+Yig,the Father of Serpents,null,null,null,null,null,null
+Yog Sothoth,the Key and the Gate,null,null,null,null,null,null

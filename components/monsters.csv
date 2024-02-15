@@ -1,0 +1,30 @@
+name,movement,movement_rule,awareness,evade_rules,dimension,abilities,physical_modifier,magical_modifier,overwhelm,nightmare,toughness,horror_rating,horror_damage,combat_rating,combat_damage,combat_rules,type,frequency
+Byakhee,Flying,null,-2,null,circle,null,1,1,0,0,1,-1,1,0,2,null,null,3
+Chthonian,Unique,"Instead of moving, roll a die. On a 4-6, all investigators in Arkham lose 1 Stamina.",1,null,triangle,null,1,1,0,0,3,-2,2,-3,3,null,null,2
+Cultist,Normal,null,-3,null,crescent,null,1,1,0,0,1,0,0,1,1,null,null,6
+Dark Young,Stationary,null,-2,null,hexagon,"physical resistance, nightmarish",0.5,1,0,1,3,0,3,-1,3,null,null,3
+Dhole,Normal,null,-1,null,circle,"physical resistance, magical resistance, overwhelming, nightmarish",0.5,0.5,1,1,3,-1,4,-3,4,null,null,1
+Dimensional Shambler,Fast,null,-3,null,square,null,1,1,0,0,1,-2,1,-2,0,"If you fail a Combat check against Dimensional Shambler, you are lost in time and space.",null,2
+Elder Thing,Normal,null,-2,"When you fail an Evade check, you must discard 1 of your Weapons or Spells.",diamond,null,1,1,0,0,2,-3,2,0,1,"When you fail a Combat check against Elder Thing, you must discard 1 of your Weapons or Spells (your choice), if able.",null,2
+Fire Vampire,Flying,null,0,null,star,"ambush, physical immunity",0,1,0,0,1,0,0,-2,2,null,null,2
+Flying Polyp,Flying,null,0,null,hexagon,"physical resistance, overwhelming, nightmarish",0.5,1,1,1,3,-2,4,-3,3,null,null,1
+Formless Spawn,Normal,null,0,null,hexagon,physical immunity,0,1,0,0,2,-1,2,-2,2,null,null,2
+Ghost,Stationary,null,-3,null,crescent,"undead, physical immunity",0,1,0,0,1,-2,2,-3,2,null,null,3
+Ghoul,Normal,null,-3,null,hexagon,ambush,1,1,0,0,1,0,1,-1,1,null,null,3
+God of the Bloody Tongue,Normal,null,1,null,triangle,"endless, overwhelming, nightmarish",1,1,1,1,4,-3,3,-4,4,null,Mask,1
+Gug,Normal,null,-2,null,slash,overwhelming,1,1,1,0,3,-1,2,-2,4,null,null,2
+Haunter of the Dark,Flying,null,-3,null,square,endless,1,1,0,0,2,-2,2,-2,2,"If the Blackest Night ccard is in play, Haunter of the Dark's combat rating increases to -5",Mask,1
+High Priest,Normal,null,-2,null,plus,magical immunity,1,0,0,0,2,1,1,-2,2,null,null,1
+Hound of Tindalos,Unique,"When it moves, the Hound of Tindalos moves directly to the nearest investigator inside a location in Arkham (Other than the Hospital or Asylum).",-1,null,square,physical immunity,0,1,0,0,2,-2,4,-1,3,null,null,2
+Maniac,Normal,null,-1,null,crescent,null,1,1,0,0,1,0,0,1,1,"If the Terror Level is at least 6, Maniac's fight rating increases to -2, his combat damage increases to 3, and he gains Endless.",null,3
+Mi-Go,Flying,null,-2,null,circle,null,1,1,0,0,1,-1,2,0,1,"If you pass a Combat check against Migo, return it to the box and draw 1 Unique Item.",null,3
+Nightgaunt,Flying,null,-2,null,slash,null,1,1,0,0,2,-1,1,-2,0,"When you fail a Combat check against Nightgaunt, yooou are draw through the nearest gate.",null,2
+Shoggoth,Fast,null,-1,null,diamond,"physical resistance, nightmarish",1,0.5,0,1,3,-1,3,-1,3,null,null,2
+Star Spawn,Normal,null,-1,null,plus,null,1,1,0,0,3,-3,2,-3,3,null,null,2
+The Black Man,Normal,null,-3,null,crescent,endless,0,0,0,0,1,0,0,0,0,"Before making a Horror check, pass a Luck (-1) check or be devoured. If you pass, gain 2 Clue tokens. In either case, return the Black Man to the cup.",Mask,1
+The Bloated Woman,Normal,null,-1,null,hexagon,endless,1,1,0,0,2,-1,2,-2,2,"Before making a Horror check, pass a Will(-2) check or automatically fail the Horror check and the Combat check.",Mask,1
+The Dark Pharoah,Normal,null,-1,null,slash,endless,1,1,0,0,2,-1,1,-3,3,Use Lore in combat with the Dark Pharoah instead of Fight.,Mask,1
+Vampire,Normal,null,-3,null,crescent,"undead, physical resistance",0.5,1,0,0,1,0,2,-3,3,null,null,1
+Warlock,Stationary,null,-3,null,circle,magical immunity,1,0,0,0,2,-1,1,-3,1,"If you pass a Combat check against Warlock, return it to the box and gain 2 Clue Tokens.",null,2
+Witch,Normal,null,-1,null,circle,magical resistance,1,0.5,0,0,1,0,0,-3,2,null,null,2
+Zombie,Normal,null,1,null,crescent,undead,1,1,0,0,1,-1,1,-1,2,null,null,3
