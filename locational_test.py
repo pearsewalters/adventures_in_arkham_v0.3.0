@@ -78,8 +78,11 @@ def adjacencies_of_arkham( map_data_csv ):
         arkham.append( location_row )
     
     # add other worlds 
-    no_adjacencies = [ 0 for n in arkham[0][1:]]
     other_worlds = [ 'R\'LYEH','PLATEAU OF LENG','THE DREAMLANDS','GREAT HALL OF CELEANO','YUGGOTH','CITY OF THE GREAT RACE','ABYSS','ANOTHER DIMENSION']
+    # add labels the first row
+    arkham[0] += other_worlds 
+    no_adjacencies = [ 0 for _ in arkham[0][1:]]
+    # add new rows with labels in the first column
     for w in other_worlds:
         arkham.append( [w] + no_adjacencies )
 
