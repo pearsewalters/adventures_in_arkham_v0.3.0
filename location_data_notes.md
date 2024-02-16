@@ -1,23 +1,23 @@
 
 # LOCATION DATA SOURCES
 
-    - Graph:  *labeled adjacency matrix*
-        - Neighbors
-        - Left
-        - Right
-    - Neighborhoood: *str*
-    - Variety ( Location, Street Area, Other World, etc. ): *str*
-    - Special Encounter: callable 
-    - Guaranteed Resources: *str*
-    - Possible Resources: *str*
-    - Stabililty: *{0,1}*
-    - Occupants: *list[str]*
-    - Status
-        - Clues: *int*
-        - Sealed: *{0,1}*
-        - Gate: *{0,1}*
-        - Explored: *{0,1}*
-        - Closed (for business): *{0,1}*
+- Graph:  *labeled adjacency matrix*
+    - Neighbors
+    - Left
+    - Right
+- Neighborhoood: *str*
+- Variety ( Location, Street Area, Other World, etc. ): *str*
+- Special Encounter: callable 
+- Guaranteed Resources: *str*
+- Possible Resources: *str*
+- Stabililty: *{0,1}*
+- Occupants: *list[str]*
+- Status
+    - Clues: *int*
+    - Sealed: *{0,1}*
+    - Gate: *{0,1}*
+    - Explored: *{0,1}*
+    - Closed (for business): *{0,1}*
 
 Of these the things that can transform are the graphs, occupants, and status.
 
