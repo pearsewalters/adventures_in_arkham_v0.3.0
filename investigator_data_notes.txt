@@ -1,6 +1,3 @@
-
-
-
 DATA SOURCES
 
 - Investigators
@@ -15,6 +12,10 @@ DATA SOURCES
         - Arrested: {0, 1}
         - Delayed: {0, 1}
         - Lost in Time & Space: {0, 1}
+        - Retainer: {0, 1}
+        - Bank Loan: {0, 1}
+        - Silver Twilight Lodge Membership: {0, 1}
+        - Deputy of Arkham: {0, 1}
         - Blessed/Cursed: {-1, 0, 1}
     - Locational ✔︎
         - Current location: str
@@ -82,8 +83,9 @@ insane_rule( matrix, next_transform, prev_transforms ) -> bool
 
 CONDITIONS
 
-[ 0, 0, 0, 0 ] represents an investigator's current conditions
-delayed := 0, arrested := 0, lost in time & space := 0, blessed/cursed := 0
+[ 0, 0, 0, 0, 0, 0, 0, 0 ] represents an investigator's current conditions
+delayed := 0, arrested := 0, lost in time & space := 0, retainer := 0, bank loan := 0,
+    silver twilight lodge membership := 0, deputy of arkham := 0, blessed/cursed := 0
 delayed, arrested, and lost in time & space exist in {0, 1}, 0 is false, 1 is true
 blessed/cursed is in {-1, 0, 1} where -1 is cursed, 1 is blessed, and 0 is neither
 
@@ -208,7 +210,6 @@ Storing transforms and getting current possessions will be different than, for e
 
     The get_current function will have all of the necessary components to rebuild the current state of possessions.
 
-Buffs are 
 
 
 
