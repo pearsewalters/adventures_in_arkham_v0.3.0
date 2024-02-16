@@ -32,7 +32,7 @@ The Neighbors graph is an undirected graph resolving regular adjacencies for Inv
 Adding an adjacency (like when a gate appears) or removing an adjacency (like when a business closes)
     is a matter of adding or subtracting 1 from the correct elements in the matrix. 
 
-'''
+```
     # closing the General Store means it is no longer adjacent to anything
     ...
     for row in graph[1:]:
@@ -40,6 +40,6 @@ Adding an adjacency (like when a gate appears) or removing an adjacency (like wh
         if row[0] == 'GENERAL STORE':
             return [ row[0] ] + [ 0 for n in row[1:] ]
     # similar function for tranforming the column
-'''
+```
 
 ## Neighborhood
