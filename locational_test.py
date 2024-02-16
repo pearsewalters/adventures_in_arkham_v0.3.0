@@ -52,42 +52,6 @@ For future reference, here's the official row number for each location.
 46: ANOTHER DIMENSION
 """
 
-
-def adjacencies_of_arkham( map_data_csv ):
-    arkham = [ [None] ]
-    neighbors = {}  
-    with open( map_data_csv ) as file:
-        table = csv.reader( file, delimiter="," )
-        
-        # transpose the first column into a header row
-        for row in table:
-            if row[0] != 'name':
-                # append to header
-                arkham[0].append( row[0] )
-                # add to neighbors dict
-                neighbors[ row[0] ] = [ w.lstrip() for w in row[3].split(',') ]
-
-    # add adjacencies
-    for location in neighbors:
-        location_row = [ location ]
-        for neighbor in arkham[0][1:]:
-            if neighbor in neighbors[location]:
-                location_row += [1]
-            else: 
-                location_row += [0]
-        arkham.append( location_row )
-    
-    # add other worlds 
-    other_worlds = [ 'R\'LYEH','PLATEAU OF LENG','THE DREAMLANDS','GREAT HALL OF CELEANO','YUGGOTH','CITY OF THE GREAT RACE','ABYSS','ANOTHER DIMENSION']
-    # add labels the first row
-    arkham[0] += other_worlds 
-    no_adjacencies = [ 0 for _ in arkham[0][1:]]
-    # add new rows with labels in the first column
-    for w in other_worlds:
-        arkham.append( [w] + no_adjacencies )
-
-    return arkham
-
 # locational data
 
 locational_defaults = [
@@ -211,9 +175,7 @@ get_current_mvmt_pts = get_current_in_arkham = get_current_loc
 # locational validators
 # dependency: adjacencies_of_arkham produces the adjacency matrix
 
-adjacency_matrix = adjacencies_of_arkham( 'locations.csv' )
-
-def change_loc_constraint( matrix, next_transform, prev_transforms ):
+def change_loc_constraint( matrix, next_transform, prev_transforms, adjacency_matrix ):
     """
         CHANGING LOCATION
     """
