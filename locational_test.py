@@ -42,8 +42,15 @@ For future reference, here's the official row number for each location.
 36: UPTOWN STREETS
 37: SOUTHSIDE STREETS
 38: OUTSKIRTS
+39: R'LYEH
+40: PLATEAU OF LENG
+41: THE DREAMLANDS
+42: GREAT HALL OF CELEANO
+43: YUGGOTH
+44: CITY OF THE GREAT RACE
+45: ABYSS
+46: ANOTHER DIMENSION
 """
-
 
 
 def adjacencies_of_arkham( map_data_csv ):
@@ -70,6 +77,12 @@ def adjacencies_of_arkham( map_data_csv ):
                 location_row += [0]
         arkham.append( location_row )
     
+    # add other worlds 
+    no_adjacencies = [ 0 for n in arkham[0][1:]]
+    other_worlds = [ 'R\'LYEH','PLATEAU OF LENG','THE DREAMLANDS','GREAT HALL OF CELEANO','YUGGOTH','CITY OF THE GREAT RACE','ABYSS','ANOTHER DIMENSION']
+    for w in other_worlds:
+        arkham.append( [w] + no_adjacencies )
+
     return arkham
 
 # locational data
@@ -229,7 +242,7 @@ def in_arkham_constraint( matrix, next_transform, prev_transforms ):
         return False
 
 
-print( adjacency_matrix )
+
 
 
 
