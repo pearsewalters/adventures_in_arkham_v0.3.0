@@ -1,7 +1,7 @@
 
 import csv
 
-def adjacencies_of_arkham( map_data_csv ):
+def adjacencies_of_arkham( map_data_csv, variety ):
     arkham = [ [None] ]
     neighbors = {}  
     with open( map_data_csv ) as file:
@@ -12,9 +12,14 @@ def adjacencies_of_arkham( map_data_csv ):
             if row[0] != 'name':
                 # append to header
                 arkham[0].append( row[0] )
-                # add to neighbors dict
-                neighbors[ row[0] ] = [ w.lstrip() for w in row[3].split(',') ]
-
+                if variety == 'neighbors':
+                    # add to neighbors dict
+                    neighbors[ row[0] ] = [ w.lstrip() for w in row[3].split(',') ]
+                if variety == 'left':
+                    neighbors[ row[0] ] = row[4]
+                if variety == 'right':
+                    neighbors[ row[0] ] = row[5] 
+               
     # add adjacencies
     for location in neighbors:
         location_row = [ location ]
@@ -36,11 +41,14 @@ def adjacencies_of_arkham( map_data_csv ):
 
     return arkham
 
-
 # locations data
 
+neighbors_graph = adjacencies_of_arkham( 'locations.csv', 'neighbors' )
+left_graph = adjacencies_of_arkham( 'locations.csv', 'left' )
+right_graph = adjacencies_of_arkham( 'locations.csv', 'right' )
+
 location_constants = [
-    [ 'name', 'neighborhood', 'variety','special','guaranteed','possible','stability']
+    [ 'name', 'neighborhood', 'variety', 'special', 'guaranteed', 'possible', 'stability'],
     [ 'CURIOSTIE SHOPPE', 'NORTHSIDE', 'LOCATION', True, 'unique items','common items',True],          
     [ 'NEWSPAPER', 'NORTHSIDE', 'LOCATION', False, None, 'money,clues', True],
     ['TRAIN STATION', 'NORTHSIDE', 'LOCATION', False, None, 'common items,unique items', True],
@@ -96,28 +104,28 @@ location_defaults = [
     ['TRAIN STATION ', [], [0,0,0,0,0]],
     ['ARKHAM ASYLUM ', [], [0,0,0,0,0]],
     ['BANK OF ARKHAM ', [], [0,0,0,0,0]],
-    ['INDEPENDENCE SQUARE ', [], [0,0,0,0,0]],
-    ['HIBB\'S ROADHOUSE ', [], [0,0,0,0,0]],
+    ['INDEPENDENCE SQUARE ', [], [1,0,0,0,0]],
+    ['HIBB\'S ROADHOUSE ', [], [1,0,0,0,0]],
     ['POLICE STATION ', [], [0,0,0,0,0]],
     ['JAIL CELL', [], [0,0,0,0,0]],
     ['VELMA\'S DINER', [], [0,0,0,0,0]],
     ['RIVER DOCKS', [], [0,0,0,0,0]],
-    ['THE UNNAMABLE', [], [0,0,0,0,0]],
-    ['UNVISITED ISLE', [], [0,0,0,0,0]],
-    ['BLACK CAVE', [], [0,0,0,0,0]],
+    ['THE UNNAMABLE', [], [1,0,0,0,0]],
+    ['UNVISITED ISLE', [], [1,0,0,0,0]],
+    ['BLACK CAVE', [], [1,0,0,0,0]],
     ['GENERAL STORE', [], [0,0,0,0,0]],
-    ['GRAVEYARD', [], [0,0,0,0,0]],
+    ['GRAVEYARD', [], [1,0,0,0,0]],
     ['ADMINISTRATION', [], [0,0,0,0,0]],
     ['SCIENCE BUILDING', [], [0,0,0,0,0]],
-    ['LIBRARY', [], [0,0,0,0,0]],
-    ['THE WITCH HOUSE', [], [0,0,0,0,0]],
-    ['THE SILVER TWILIGHT LODGE', [], [0,0,0,0,0]],
+    ['LIBRARY', [], [1,0,0,0,0]],
+    ['THE WITCH HOUSE', [], [1,0,0,0,0]],
+    ['THE SILVER TWILIGHT LODGE', [], [1,0,0,0,0]],
     ['THE INNER SANCTUM', [], [0,0,0,0,0]],
     ['ST. MARY\'S HOSPITAL', [], [0,0,0,0,0]],
-    ['WOODS', [], [0,0,0,0,0]],
+    ['WOODS', [], [1,0,0,0,0]],
     ['YE OLDE MAGICK SHOPPE', [], [0,0,0,0,0]],
     ['MA\'S BOARDING HOUSE', [], [0,0,0,0,0]],
-    ['HISTORICAL SOCIETY', [], [0,0,0,0,0]],
+    ['HISTORICAL SOCIETY', [], [1,0,0,0,0]],
     ['SOUTH CHURCH', [], [0,0,0,0,0]],
     ['NORTHSIDE STREETS', [], [0,0,0,0,0]],
     ['DOWNTOWN STREETS', [], [0,0,0,0,0]],
