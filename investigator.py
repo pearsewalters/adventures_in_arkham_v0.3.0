@@ -65,7 +65,7 @@ investigator_transforms = [
 def inc_health_stat( matrix ):
     return [ matrix[0], matrix[1] + 1, matrix[2] ]
 
-def dec_health_stat( matrix )
+def dec_health_stat( matrix ):
     return [ matrix[0], matrix[1] - 1, matrix[2] ]
 
 def current_stat( matrix, transformations ):
