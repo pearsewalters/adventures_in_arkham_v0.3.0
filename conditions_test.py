@@ -150,7 +150,7 @@ def twilight_constraints( matrix, next_transform, prev_transforms ):
 
 def deputy_constraints( matrix, next_transform, prev_transforms ):
     """
-        RETAINER
+        DEPUTY OF ARKHAM
         A Character is deputized for certain heroic acts. If a Character is a deputy, they 
         immediately gain a Patrol Wagon and a Deputy's Revolver, and they gain $1 every Upkeep.
         This stat exists in {0,1} where 0 is 'not deputized', and 1 is 'deputized'.
