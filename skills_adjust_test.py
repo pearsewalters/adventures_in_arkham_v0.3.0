@@ -1,5 +1,4 @@
 from icecream import ic
-import inspect
 
 # base transformation functions
 def inc_skill( matrix ):
