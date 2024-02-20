@@ -37,12 +37,7 @@ def equip_item( matrix, item ):
     return [ matrix[0], matrix[1]+[item] ]
 
 def unequip( matrix, item ):
-    equipment = [ i for i in matrix[1] ]
-    for i in range( len( equipment ) ):
-        if equipment[i] == item:
-            del equipment[i]
-            break
-    return [ matrix[0], equipment ]
+    return matrix[:matrix.index(item)] + matrix[matrix.index(item)+1:]
 
 def exhaust_item( matrix, item ):
     return matrix + [item]
@@ -58,7 +53,9 @@ def copy_of_possessions( possessions ):
         'monster_trophies' : possessions['monster_trophies'], 
         'common' : [ i for i in possessions['common'] ],
         'unique' : [ j for j in possessions['unique'] ],
-        'spells' : [ k for k in possessions['spells'] ]
+        'spells' : [ k for k in possessions['spells'] ],
+        'buffs' : [ l for l in possessions['buffs'] ],
+        'allies' : [ m for m in possessions['allies'] ]
     }
 
 def inc_money( possessions ):
@@ -148,72 +145,5 @@ get_current_equipment = get_current_possessions
 
 # validators    
 
-def hands_constraint( matrix, next_transform, prev_transforms ):
-    """
-        HANDS
-        Investigators have a standard 2 hands available. Reducing this to less than 0 is illegal.
-        Some items or spells may increase the number of hands, but this constraint gives no upper limit.
 
-        Returns True if the proposed transform is 0 <= hands, else returns False
-    """
-    transformed_matrix = next_transform( get_current_equipment( matrix, prev_transforms ) )
-    # can't be less than 0
-    if 0 <= transformed_matrix[0]:
-        return True
-    else:
-        return False
-    
-def money_constraint( dictionary, next_transform, prev_transforms ):
-    """
-        MONEY
-        Money exists in [0,inf). While the analog game has a finite amount of money tokens, 
-            right now there is no rule regarding what happens when that pool of tokens runs out.
-            Since this is the case, I am assuming there's no reason to believe the money should 
-            run out for any reason.
-    """
-    transformed_dictionary = next_transform( get_current_possessions( dictionary, prev_transforms ) )
-    # can't be less than 0
-    if 0 <= transformed_dictionary['money']:
-        return True
-    else:
-        return False
-
-def clues_constraint( dictionary, next_transform, prev_transforms ):
-    """
-        CLUES
-        Clues exists in [0,inf), and so 'negative clues' is illegal. The analog game may have something to 
-            say about running out of clue tokens, but I'm choosing to treat clue tokens as an infinite resource.
-    """
-    transformed_dictionary = next_transform( get_current_possessions( dictionary, prev_transforms ) )
-    # can't be less than 0
-    if 0 <= transformed_dictionary['clues']:
-        return True
-    else:
-        return False
-    
-def gate_trophy_constraint( dictionary, next_transform, prev_transforms ):
-    """
-        GATE TROPHIES
-        Gate trophies exist in [0,num_gates] where num_gates is the number of gate tokens in the game.
-        Base game includes 16 gate tokens. Rewrite this constraint when including expansions.
-    """
-    transformed_dictionary = next_transform( get_current_possessions( dictionary, prev_transforms ) )
-    if 0 <= transformed_dictionary['gate_trophies'] <= 16:
-        return True
-    else:
-        return False
-    
-def monster_trophy_constraint( dictionary, next_transform, prev_transforms ):
-    """
-        MONSTER TROPHIES
-        Monster trophies exist in [0,num_monsters] where num_monsters is the number of monster tokens in the game.
-        Base game includes 55 regular monsters. 
-        Rewrite this constraint whenever additional monsters are added, such as Nyarlathotep's masks or including 
-            expansions.
-    """
-    transformed_dictionary = next_transform( get_current_possessions( dictionary, prev_transforms ) )
-    if 0 <= transformed_dictionary['monster_trophies'] <= 55:
-        return True
-    else:
-        return False
 
