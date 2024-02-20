@@ -19,28 +19,28 @@ investigator_constants = [
 ]
 
 investigator_defaults = [
-    ['name',            'damage',  'horror',  'conditions',             'focus',   'speed',   'fight',   'lore',    'location', 'random_possessions', 'equipped_items', 'exhausted_items', 'possessions']
-    ['Amanda Sharpe',   [5, 0, 0], [5, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [2, 2, 0], [4, 4, 5], [4, 4, 5], [4, 4, 5], [19, 0, 1], [1, 1, 1, 2],         [2, []],          [],                {'money': 1, 'clues': 1, 'gate_trophies': 0, 'monster_trophies': 0, 'common': [], 'unique': [], 'spells': [], 'buffs': [], 'allies': []}]
-    ['"Ashcan" Pete',   [5, 0, 0], [5, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [1, 1, 0], [3, 3, 6], [5, 5, 7], [3, 3, 3], [11, 0, 1], [1, 1, 0, 1],         [2, []],          [],                {'money': 1, 'clues': 3, 'gate_trophies': 0, 'monster_trophies': 0, 'common': [], 'unique': [], 'spells': [], 'buffs': [], 'allies': ['Duke']}]
-    ['Bob Jenkins',     [6, 0, 0], [4, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [1, 1, 0], [5, 5, 5], [4, 4, 7], [3, 3, 4], [15, 0, 1], [2, 2, 0, 1],         [2, []],          [],                {'money': 9, 'clues': 0, 'gate_trophies': 0, 'monster_trophies': 0, 'common': [], 'unique': [], 'spells': [], 'buffs': [], 'allies': []}]
-    ['Carolyn Fern',    [4, 0, 0], [6, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [2, 2, 0], [3, 3, 3], [4, 4, 5], [5, 5, 7], [4, 0, 1],  [2, 2, 0, 1],         [2, []],          [],                {'money': 7, 'clues': 1, 'gate_trophies': 0, 'monster_trophies': 0, 'common': [], 'unique': [], 'spells': [], 'buffs': [], 'allies': []}]
-    ['Darrell Simmons', [6, 0, 0], [4, 0, 0], [0, 0, 0, 1, 0, 0, 0, 0], [2, 2, 0], [5, 5, 5], [5, 5, 6], [3, 3, 4], [2, 0, 1],  [1, 2, 0, 1],         [2, []],          [],                {'money': 4, 'clues': 1, 'gate_trophies': 0, 'monster_trophies': 0, 'common': [], 'unique': [], 'spells': [], 'buffs': [], 'allies': []}]
-    ['Dexter Drake',    [5, 0, 0], [5, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [2, 2, 0], [5, 5, 6], [4, 4, 4], [5, 5, 5], [25, 0, 1], [1, 1, 2, 1],         [2, []],          [],                {'money': 5, 'clues': 0, 'gate_trophies': 0, 'monster_trophies': 0, 'common': [], 'unique': [], 'spells': ['Shrivelling'], 'buffs': [], 'allies': []}]
-    ['Gloria Goldberg', [4, 0, 0], [6, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [2, 2, 0], [4, 4, 4], [3, 3, 5], [4, 4, 6], [10, 0, 1], [2, 0, 2, 1],         [2, []],          [],                {'money': 7, 'clues': 2, 'gate_trophies': 0, 'monster_trophies': 0, 'common': [], 'unique': [], 'spells': [], 'buffs': [], 'allies': []}]
-    ['Harvey Walters',  [3, 0, 0], [7, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [2, 2, 0], [3, 3, 5], [3, 3, 3], [6, 6, 7], [17, 0, 1], [0, 2, 2, 1],         [2, []],          [],                {'money': 5, 'clues': 1, 'gate_trophies': 0, 'monster_trophies': 0, 'common': [], 'unique': [], 'spells': [], 'buffs': [], 'allies': []}]
-    ['Jenny Barnes',    [4, 0, 0], [6, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [1, 1, 0], [3, 3, 4], [4, 4, 6], [4, 4, 6], [3, 0, 1],  [2, 1, 1, 1],         [2, []],          [],                {'money': 10, 'clues': 0, 'gate_trophies': 0, 'monster_trophies': 0, 'common': [], 'unique': [], 'spells': [], 'buffs': [], 'allies': []}]
-    ['Joe Diamond',     [6, 0, 0], [4, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [3, 3, 0], [6, 6, 7], [5, 5, 5], [3, 3, 0], [8, 0, 1],  [2, 0, 0, 1],         [2, []],          [],                {'money': 8, 'clues': 3, 'gate_trophies': 0, 'monster_trophies': 0, 'common': ['.45 Automatic'], 'unique': [], 'spells': [], 'buffs': [], 'allies': []}]
-    ['Kate Winthrop',   [4, 0, 0], [6, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [1, 1, 0], [4, 4, 6], [4, 4, 4], [5, 5, 6], [18, 0, 1], [1, 1, 2, 1],         [2, []],          [],                {'money': 7, 'clues': 2, 'gate_trophies': 0, 'monster_trophies': 0, 'common': [], 'unique': [], 'spells': [], 'buffs': [], 'allies': []}]
-    ['Mandy Thompson',  [5, 0, 0], [5, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [2, 2, 0], [4, 4, 6], [3, 3, 5], [4, 4, 4], [19, 0, 1], [2, 1, 0, 1],         [2, []],          [],                {'money': 6, 'clues': 4, 'gate_trophies': 0, 'monster_trophies': 0, 'common': [], 'unique': [], 'spells': [], 'buffs': [], 'allies': []}]
-    ['Michael McGlen',  [7, 0, 0], [3, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [1, 1, 0], [5, 5, 6], [6, 6, 7], [3, 3, 3], [26, 0, 1], [0, 1, 0, 1],         [2, []],          [],                {'money': 8, 'clues': 0, 'gate_trophies': 0, 'monster_trophies': 0, 'common': ['Dynamite', 'Tommy Gun'], 'unique': [], 'spells': [], 'buffs': [], 'allies': []}]
-    ['Monterey Jack',   [7, 0, 0], [3, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [2, 2, 0], [4, 4, 4], [5, 5, 5], [4, 4, 6], [1, 0, 1],  [0, 2, 0, 1],         [2, []],          [],                {'money': 7, 'clues': 1, 'gate_trophies': 0, 'monster_trophies': 0, 'common': ['Bullwhip', '.38 Revolver'], 'unique': [], 'spells': [], 'buffs': [], 'allies': []}]
-    ['Sister Mary',     [3, 0, 0], [7, 0, 0], [0, 0, 0, 0, 0, 0, 0, 1], [1, 1, 0], [4, 4, 5], [3, 3, 4], [4, 4, 7], [28, 0, 1], [0, 0, 2, 1],         [2, []],          [],                {'money': 0, 'clues': 0, 'gate_trophies': 0, 'monster_trophies': 0, 'common': ['Cross'], 'unique': ['Holy Water'], 'spells': [], 'buffs': [], 'allies': []}]
+    ['name',            'damage',  'horror',  'conditions',             'focus',   'speed',   'fight',   'lore',    'location', 'random_possessions', 'equipped_items', 'exhausted_items', 'possessions'],
+    ['Amanda Sharpe',   [5, 0, 0], [5, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [2, 2, 0], [4, 4, 5], [4, 4, 5], [4, 4, 5], [19, 0, 1], [1, 1, 1, 2],         [2, []],          [],                {'money': 1, 'clues': 1, 'gate_trophies': 0, 'monster_trophies': 0, 'common': [], 'unique': [], 'spells': [], 'buffs': [], 'allies': []}],
+    ['"Ashcan" Pete',   [5, 0, 0], [5, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [1, 1, 0], [3, 3, 6], [5, 5, 7], [3, 3, 3], [11, 0, 1], [1, 1, 0, 1],         [2, []],          [],                {'money': 1, 'clues': 3, 'gate_trophies': 0, 'monster_trophies': 0, 'common': [], 'unique': [], 'spells': [], 'buffs': [], 'allies': ['Duke']}],
+    ['Bob Jenkins',     [6, 0, 0], [4, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [1, 1, 0], [5, 5, 5], [4, 4, 7], [3, 3, 4], [15, 0, 1], [2, 2, 0, 1],         [2, []],          [],                {'money': 9, 'clues': 0, 'gate_trophies': 0, 'monster_trophies': 0, 'common': [], 'unique': [], 'spells': [], 'buffs': [], 'allies': []}],
+    ['Carolyn Fern',    [4, 0, 0], [6, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [2, 2, 0], [3, 3, 3], [4, 4, 5], [5, 5, 7], [4, 0, 1],  [2, 2, 0, 1],         [2, []],          [],                {'money': 7, 'clues': 1, 'gate_trophies': 0, 'monster_trophies': 0, 'common': [], 'unique': [], 'spells': [], 'buffs': [], 'allies': []}],
+    ['Darrell Simmons', [6, 0, 0], [4, 0, 0], [0, 0, 0, 1, 0, 0, 0, 0], [2, 2, 0], [5, 5, 5], [5, 5, 6], [3, 3, 4], [2, 0, 1],  [1, 2, 0, 1],         [2, []],          [],                {'money': 4, 'clues': 1, 'gate_trophies': 0, 'monster_trophies': 0, 'common': [], 'unique': [], 'spells': [], 'buffs': [], 'allies': []}],
+    ['Dexter Drake',    [5, 0, 0], [5, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [2, 2, 0], [5, 5, 6], [4, 4, 4], [5, 5, 5], [25, 0, 1], [1, 1, 2, 1],         [2, []],          [],                {'money': 5, 'clues': 0, 'gate_trophies': 0, 'monster_trophies': 0, 'common': [], 'unique': [], 'spells': ['Shrivelling'], 'buffs': [], 'allies': []}],
+    ['Gloria Goldberg', [4, 0, 0], [6, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [2, 2, 0], [4, 4, 4], [3, 3, 5], [4, 4, 6], [10, 0, 1], [2, 0, 2, 1],         [2, []],          [],                {'money': 7, 'clues': 2, 'gate_trophies': 0, 'monster_trophies': 0, 'common': [], 'unique': [], 'spells': [], 'buffs': [], 'allies': []}],
+    ['Harvey Walters',  [3, 0, 0], [7, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [2, 2, 0], [3, 3, 5], [3, 3, 3], [6, 6, 7], [17, 0, 1], [0, 2, 2, 1],         [2, []],          [],                {'money': 5, 'clues': 1, 'gate_trophies': 0, 'monster_trophies': 0, 'common': [], 'unique': [], 'spells': [], 'buffs': [], 'allies': []}],
+    ['Jenny Barnes',    [4, 0, 0], [6, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [1, 1, 0], [3, 3, 4], [4, 4, 6], [4, 4, 6], [3, 0, 1],  [2, 1, 1, 1],         [2, []],          [],                {'money': 10, 'clues': 0, 'gate_trophies': 0, 'monster_trophies': 0, 'common': [], 'unique': [], 'spells': [], 'buffs': [], 'allies': []}],
+    ['Joe Diamond',     [6, 0, 0], [4, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [3, 3, 0], [6, 6, 7], [5, 5, 5], [3, 3, 0], [8, 0, 1],  [2, 0, 0, 1],         [2, []],          [],                {'money': 8, 'clues': 3, 'gate_trophies': 0, 'monster_trophies': 0, 'common': ['.45 Automatic'], 'unique': [], 'spells': [], 'buffs': [], 'allies': []}],
+    ['Kate Winthrop',   [4, 0, 0], [6, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [1, 1, 0], [4, 4, 6], [4, 4, 4], [5, 5, 6], [18, 0, 1], [1, 1, 2, 1],         [2, []],          [],                {'money': 7, 'clues': 2, 'gate_trophies': 0, 'monster_trophies': 0, 'common': [], 'unique': [], 'spells': [], 'buffs': [], 'allies': []}],
+    ['Mandy Thompson',  [5, 0, 0], [5, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [2, 2, 0], [4, 4, 6], [3, 3, 5], [4, 4, 4], [19, 0, 1], [2, 1, 0, 1],         [2, []],          [],                {'money': 6, 'clues': 4, 'gate_trophies': 0, 'monster_trophies': 0, 'common': [], 'unique': [], 'spells': [], 'buffs': [], 'allies': []}],
+    ['Michael McGlen',  [7, 0, 0], [3, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [1, 1, 0], [5, 5, 6], [6, 6, 7], [3, 3, 3], [26, 0, 1], [0, 1, 0, 1],         [2, []],          [],                {'money': 8, 'clues': 0, 'gate_trophies': 0, 'monster_trophies': 0, 'common': ['Dynamite', 'Tommy Gun'], 'unique': [], 'spells': [], 'buffs': [], 'allies': []}],
+    ['Monterey Jack',   [7, 0, 0], [3, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [2, 2, 0], [4, 4, 4], [5, 5, 5], [4, 4, 6], [1, 0, 1],  [0, 2, 0, 1],         [2, []],          [],                {'money': 7, 'clues': 1, 'gate_trophies': 0, 'monster_trophies': 0, 'common': ['Bullwhip', '.38 Revolver'], 'unique': [], 'spells': [], 'buffs': [], 'allies': []}],
+    ['Sister Mary',     [3, 0, 0], [7, 0, 0], [0, 0, 0, 0, 0, 0, 0, 1], [1, 1, 0], [4, 4, 5], [3, 3, 4], [4, 4, 7], [28, 0, 1], [0, 0, 2, 1],         [2, []],          [],                {'money': 0, 'clues': 0, 'gate_trophies': 0, 'monster_trophies': 0, 'common': ['Cross'], 'unique': ['Holy Water'], 'spells': [], 'buffs': [], 'allies': []}],
     ['Vincent Lee',     [5, 0, 0], [5, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [2, 2, 0], [3, 3, 5], [3, 3, 4], [5, 5, 6], [23, 0, 1], [2, 0, 2, 1],         [2, []],          [],                {'money': 9, 'clues': 1, 'gate_trophies': 0, 'monster_trophies': 0, 'common': [], 'unique': [], 'spells': [], 'buffs': [], 'allies': []}]
 ]
 
 investigator_transforms = [
     [ 'name','damage','horror','conditions','focus','speed','fight','lore','location','random_possessions','equipped_items','exhausted_items','possessions'],
-    ['Amanda Sharpe', [], [], [], [], [], [], [], [], [], [], [], []],
+    ['Amanda Sharpe', [], [], [], [], [], [], [], [], [], [], [], [] ],
     ['"Ashcan" Pete', [], [], [], [], [], [], [], [], [], [], [], []],
     ['Bob Jenkins', [], [], [], [], [], [], [], [], [], [], [], []],
     ['Carolyn Fern', [], [], [], [], [], [], [], [], [], [], [], []],
@@ -75,40 +75,40 @@ def current_stat( matrix, transformations ):
     return stat
 
 def inc_damage( matrix ):
-    return inc_health_stat( matrix )
+    return [ matrix[0], matrix[1] + 1, matrix[2] ]
 
 def dec_damage( matrix ):
-    return dec_health_stat( matrix )
+    return [ matrix[0], matrix[1] - 1, matrix[2] ]
 
 def inc_max_damage( matrix ):
-    return inc_health_stat( matrix )
+    return [ matrix[0] + 1, matrix[1], matrix[2] ]
 
 def dec_max_damage( matrix ):
-    return dec_health_stat( matrix )
+    return [ matrix[0] - 1, matrix[1], matrix[2] ]
 
 def inc_horror( matrix ):
-    return inc_health_stat( matrix )
+    return inc_damage( matrix )
 
 def dec_horror( matrix ):
-    return dec_health_stat( matrix )
+    return dec_damage( matrix )
 
 def inc_max_horror( matrix ):
-    return inc_health_stat( matrix )
+    return inc_max_damage( matrix )
 
 def dec_max_horror( matrix ):
-    return dec_health_stat( matrix )
-
-def set_insane( matrix ):
-    return inc_health_stat( matrix )
-
-def set_sane( matrix ):
-    return dec_health_stat( matrix )
+    return dec_max_damage( matrix )
 
 def set_uncon( matrix ):
-    return inc_health_stat( matrix )
+    return [ matrix[0], matrix[1], matrix[2] + 1 ]
 
 def set_con( matrix ):
-    return dec_health_stat( matrix )
+    return [ matrix[0], matrix[1], matrix[2] - 1 ]
+
+def set_insane( matrix ):
+    return set_uncon( matrix )
+
+def set_sane( matrix ):
+    return set_con( matrix )
 
 # conditions
 
@@ -458,10 +458,10 @@ def damage_constraint( matrix, next_transform, prev_transforms ):
     """
     transformed_matrix = next_transform( current_stat( matrix, prev_transforms ) )
     # damage can't less than 0 or greater than max
-    if 0 <= transformed_matrix[1] < transformed_matrix[0]:
+    if 0 <= transformed_matrix[1] <= transformed_matrix[0]:
         return 1
     # character is unconscious if max damage is reached
-    elif transformed_matrix[0] >= transformed_matrix[1]:
+    elif transformed_matrix[1] > transformed_matrix[0]:
         return 2
     # otherwise, invalid transform
     else:
