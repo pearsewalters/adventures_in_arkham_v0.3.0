@@ -55,6 +55,7 @@ get_damage = get_horror = get_max_damage = get_max_horror = get_insane = get_unc
 
 
 # validators
+
 def damage_constraint( matrix, next_transform, prev_transforms ):
     """
         DAMAGE:
@@ -84,7 +85,7 @@ def damage_constraint( matrix, next_transform, prev_transforms ):
     else:
         return 0
 
-horror_constraint, horror_constraint.__name__ = damage_constraint, 'horror_constraint'
+horror_constraint = damage_constraint
 
 def unconscious_constraint( matrix, next_transform, prev_transforms ):
     """
@@ -103,7 +104,7 @@ def unconscious_constraint( matrix, next_transform, prev_transforms ):
     else:
         return False
 
-insane_constraint = unconscious_constraint
+
 
 
     
