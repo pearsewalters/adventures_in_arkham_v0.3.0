@@ -318,6 +318,7 @@ def move_to_FRENCH_HILL_STREETS( matrix ):
 
 def move_to_ST_MARYS_HOSPITAL( matrix ):
     return change_loc( matrix, 23 )
+
 def move_to_WOODS( matrix ):
     return change_loc( matrix, 24 )
 
