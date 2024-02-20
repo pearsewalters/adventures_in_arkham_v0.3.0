@@ -1,4 +1,4 @@
-# INVESTIGATR DATA 
+# INVESTIGATOR DATA 
 
 
 - Health Status ✔︎
