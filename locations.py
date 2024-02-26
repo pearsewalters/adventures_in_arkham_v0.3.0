@@ -147,6 +147,56 @@ location_defaults = [
     ['ANOTHER DIMENSION', [], [0,0,0,0,0]]
 ]
 
+location_transforms = [
+    [ 'name', 'occupants', 'status' ],
+    [ 'CURIOSTIE SHOPPE', [], []],
+    [ 'NEWSPAPER' , [], []],
+    ['TRAIN STATION ', [], []],
+    ['ARKHAM ASYLUM ', [], []],
+    ['BANK OF ARKHAM ', [], []],
+    ['INDEPENDENCE SQUARE ', [], []],
+    ['HIBB\'S ROADHOUSE ', [], []],
+    ['POLICE STATION ', [], []],
+    ['JAIL CELL', [], []],
+    ['VELMA\'S DINER', [], []],
+    ['RIVER DOCKS', [], []],
+    ['THE UNNAMABLE', [], []],
+    ['UNVISITED ISLE', [], []],
+    ['BLACK CAVE', [], []],
+    ['GENERAL STORE', [], []],
+    ['GRAVEYARD', [], []],
+    ['ADMINISTRATION', [], []],
+    ['SCIENCE BUILDING', [], []],
+    ['LIBRARY', [], []],
+    ['THE WITCH HOUSE', [], []],
+    ['THE SILVER TWILIGHT LODGE', [], []],
+    ['THE INNER SANCTUM', [], []],
+    ['ST. MARY\'S HOSPITAL', [], []],
+    ['WOODS', [], []],
+    ['YE OLDE MAGICK SHOPPE', [], []],
+    ['MA\'S BOARDING HOUSE', [], []],
+    ['HISTORICAL SOCIETY', [], []],
+    ['SOUTH CHURCH', [], []],
+    ['NORTHSIDE STREETS', [], []],
+    ['DOWNTOWN STREETS', [], []],
+    ['EASTTOWN STREETS', [], []],
+    ['MERCHANT DISTRICT STREETS', [], []],
+    ['RIVERTOWN STREETS', [], []],
+    ['MISKATONIC UNIVERSITY STREETS', [], []],
+    ['FRENCH HILL STREETS', [], []],
+    ['UPTOWN STREETS', [], []],
+    ['SOUTHSIDE STREETS', [], []],
+    ['OUTSKIRTS', [], []],
+    ['R\'LYEH', [], []],
+    ['PLATEAU OF LENG', [], []],
+    ['THE DREAMLANDS', [], []],
+    ['GREAT HALL OF CELEANO', [], []],
+    ['YUGGOTH', [], []],
+    ['CITY OF THE GREAT RACE', [], []],
+    ['ABYSS', [], []],
+    ['ANOTHER DIMENSION', [], []]
+]
+
 def add_occupant( matrix, occupant ):
     return matrix + [ occupant ]
 
@@ -182,3 +232,107 @@ def mark_closed( matrix ):
 
 def mark_open( matrix ):
     return [ matrix[0], matrix[1], matrix[2], matrix[3], matrix[4]-1 ]
+
+def current_location_status( matrix, transformations ):
+    location = matrix
+    for transformation in transformations:
+        location = transformation( location )
+    return location
+
+
+# validators
+
+def location_clues_constraint( matrix, next_transform, prev_transforms ):
+    """
+        CLUES AT LOCATIONS
+        There is no upper limit to the number of clues at a location, but it should 
+            never be less than 0. That is unless, of course, some future release has 
+            a feature wherein a location could make an Investigator forget what they've
+            discovered...
+        Additionally, clues cannot appear on locations that have a gate already or have
+            already been sealed
+        This stat exists in [0, inf), at least for now...
+        This validator returns -2 if there is a gate on the location,
+                               -1 if there is a seal on the location,
+                               0 if passed a bad transform,
+                               1 if passed a good transform.
+    """
+    transformed_matrix = next_transform( current_location_status( matrix, prev_transforms) )
+    # can't be less than 0 or on a location with a gate or a seal
+    if transformed_matrix[0] >= 0 and transformed_matrix[1] != 1 and transformed_matrix[2] != 1:
+        return 1
+    elif transformed_matrix[1] == 1:
+        return -1
+    elif transformed_matrix[2] == 1:
+        return -2
+    else:
+        return 0
+    
+def location_seal_constraint( matrix, next_transform, prev_transforms ):
+    """
+        SEALS ON LOCATIONS
+        A gate cannot open on a sealed location. Sealed locations may become unsealed by 
+            way of various game effects.
+        This stat exists in {0,1} where 0 is unsealed and 1 is sealed.
+    """
+    transformed_matrix = next_transform( current_location_status( matrix, prev_transforms) )
+    # has to be 0 or 1
+    if 0 <= transformed_matrix[1] <= 1:
+        return True
+    else:
+        return False
+    
+def location_gate_constraint( matrix, next_transform, prev_transforms ):
+    """
+        GATES ON LOCATIONS
+        A gate on a location is a portal to one of the Other Worlds. A location cannot have 
+            more than 1 gate on it. If a gate attempts to open on a location with a gate 
+            already, a monster surge ensues, wherein every a monster spills out of every open
+            gate in Arkham.
+        This stat exists in {0,1} where 0 is 'has no gate' and 1 is 'has gate.'
+        This function returns from {0,1,2} where 0 is a bad transform,
+                                                 1 is a good transform but no monster surge, and
+                                                 2 is a good transform with a monster surge.
+    """
+    transformed_matrix = next_transform( current_location_status( matrix, prev_transforms) )
+    if transformed_matrix[2] < 0:
+        return 0
+    elif 0 <= transformed_matrix[2] <= 1:
+        return 1
+    elif 1 < transformed_matrix[2]:
+        return 2
+
+def location_explored_constraint( matrix, next_transform, prev_transforms ):
+    """
+        EXPLORED GATE AT LOCATION
+        If a location is marked as having been explored, any investigator who is at that location
+            may attempt to close or seal the gate that is at the location. Once an investigator 
+            leaves that location, it is no longer considered 'explored.' 
+        A location is said to have been explored if an Investigator arrives there from an Other 
+            World. 
+        This stat exists in {0,1} where 0 is not explored, and 1 is explored.
+    """
+    transformed_matrix = next_transform( current_location_status( matrix, prev_transforms) )
+    # has to be 0 or 1
+    if 0 <= transformed_matrix[3] <= 1:
+        return True
+    else:
+        return False
+    
+def location_closed_constraint( matrix, next_transform, prev_transforms ):
+    """
+        CLOSED LOCATIONS
+        Locations can close for a number of reasons, but commonly because of Terror Track effects.
+            If an Investigator travels to a location that is closed, their encounter there will 
+            be a Sneak[-1] check. With 1 success they will gain one of the two resources that 
+            location has to offer. With 2 successes they will gain both resources the location offers.
+            With 0 successes, a Luck[-1] check will occur; on a failure, the Investigator is ARRESTED.
+        This stat exists in {0,1} with 0 being open for business, and 1 being closed.
+    """
+    transformed_matrix = next_transform( current_location_status( matrix, prev_transforms) )
+    # has to be 0 or 1
+    if 0 <= transformed_matrix[4] <= 1:
+        return True
+    else:
+        return False
+    
