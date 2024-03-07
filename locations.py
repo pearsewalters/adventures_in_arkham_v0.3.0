@@ -1,51 +1,55 @@
 
 import csv
 
-def adjacencies_of_arkham( map_data_csv, variety ):
-    arkham = [ [None] ]
-    neighbors = {}  
+def adjacencies_of_arkham( map_data_csv ):
+    neighbors = [  ]
+
     with open( map_data_csv ) as file:
         table = csv.reader( file, delimiter="," )
-        
-        # transpose the first column into a header row
+        headers = next( table )
         for row in table:
-            if row[0] != 'name':
-                # append to header
-                arkham[0].append( row[0] )
-                if variety == 'neighbors':
-                    # add to neighbors dict
-                    neighbors[ row[0] ] = [ w.lstrip() for w in row[3].split(',') ]
-                if variety == 'left':
-                    neighbors[ row[0] ] = row[4]
-                if variety == 'right':
-                    neighbors[ row[0] ] = row[5] 
-               
-    # add adjacencies
-    for location in neighbors:
-        location_row = [ location ]
-        for neighbor in arkham[0][1:]:
-            if neighbor in neighbors[location]:
-                location_row += [1]
-            else: 
-                location_row += [0]
-        arkham.append( location_row )
-    
-    # add other worlds 
-    other_worlds = [ 'R\'LYEH','PLATEAU OF LENG','THE DREAMLANDS','GREAT HALL OF CELEANO','YUGGOTH','CITY OF THE GREAT RACE','ABYSS','ANOTHER DIMENSION']
-    # add labels the first row
-    arkham[0] += other_worlds 
-    no_adjacencies = [ 0 for _ in arkham[0][1:]]
-    # add new rows with labels in the first column
-    for w in other_worlds:
-        arkham.append( [w] + no_adjacencies )
+            neighbors.append( [ row[0], row[3], row[4], row[5] ] )
 
-    return arkham
+    # add other worlds
+    other_worlds = [ 'R\'LYEH','PLATEAU OF LENG','THE DREAMLANDS','GREAT HALL OF CELEANO','YUGGOTH','CITY OF THE GREAT RACE','ABYSS','ANOTHER DIMENSION']
+    for world in other_worlds:
+        neighbors.append( [ world, 'null', 'null', 'null' ] )
+
+    # initialize matrices
+    all_neighbors, left_neighbors, right_neighbors = [ [ None ] ], [ [ None ] ], [ [ None ] ]
+
+    def create_matrix( blank, reference ):
+        """Creates a labeled 0-matrix from a blank"""
+        num_locations = len( reference )
+
+        for location in reference:
+            # add column headers 
+            blank[0].append( location[0] )
+            # add rows with row headers
+            blank.append( [ location[0] ] + [ 0 for n in range( num_locations ) ] )
+
+        return blank
+
+    def assign_neighbors( matrix, reference, direction ):
+        """Fills out matrix using reference data"""
+        for a,b in zip( matrix[1:], reference ):
+            ref = [ w.strip() for w in b[ direction ].split(',') ]
+            for index, val in enumerate( matrix[0][1:] ):
+                if val in ref:
+                    a[index+1] = 1
+        return matrix
+
+    all_neighbors = assign_neighbors( create_matrix( all_neighbors, neighbors ), neighbors, 1 )
+    left_neighbors = assign_neighbors( create_matrix( left_neighbors, neighbors ), neighbors, 2 )
+    right_neighbors = assign_neighbors( create_matrix( right_neighbors, neighbors ), neighbors, 3 )
+
+    return all_neighbors, left_neighbors, right_neighbors
+    
+    
 
 # locations data
 
-neighbors_graph = adjacencies_of_arkham( 'locations.csv', 'neighbors' )
-left_graph = adjacencies_of_arkham( 'locations.csv', 'left' )
-right_graph = adjacencies_of_arkham( 'locations.csv', 'right' )
+all_neighbors, left_neighbors, right_neighbors = adjacencies_of_arkham( 'locations.csv' )
 
 location_constants = [
     ['name',                          'neighborhood',           'variety',     'special', 'guaranteed',     'possible',                  'instability', 'mystery' ],
