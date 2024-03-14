@@ -74,10 +74,11 @@ def add_occupant( matrix, occupant ):
 
 ## Status
 
-This will be a list that gets passed into a transformer. It looks like `[ 0, 0, 0, 0, 0 ]`
+This will be a list that gets passed into a transformer. It looks like `[ 0, 0, 0, 0, 0, 0 ]`
 
 In order, the elements are:
 - number of clues at that location
+- number of clues that have ever been at the location
 - whether or not the location is sealed (gates cannot appear on sealed locations)
 - whether or not there is a gate on the location
 - whether or not a gate has been explored
