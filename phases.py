@@ -1,8 +1,14 @@
-import tools, transformers, currency, constraints
+import tools, transformers, currency, constraints, commands, upkeep_funcs
+from params import DEBUG, DEBUG_LVL, BLESS_CURSE_DIE, RETAINER_DIE, BANK_LOAN_DIE
 
-from icecream import ic
+## debugging
+if not DEBUG or DEBUG_LVL < 0:
+    ic.disable()
 
 def mythos( context ):
+    """ Performs Mythos phase bookkeeping """
+
+    print( f'\n\n\x1b[1;38;5;191m{'*'*50}  MYTHOS  {'*'*50}\x1b[22;38;5;70m\n\n')
 
     gate_distro = {}
     clue_distro = {}
@@ -33,8 +39,6 @@ def mythos( context ):
         'transforms' : [ row for row in context['locations']['transforms'][1:] if row[0] ==  new_clue ][0]   
     }
 
-    ic( new_gate_desc )
-
     draw_gate = constraints.location_gate_constraint( new_gate_desc['defaults'][2], transformers.add_gate, new_gate_desc['transforms'][2] )
     gate_limit = constraints.too_many_gates_constraint( context['board']['defaults']['gates_open'], transformers.inc_gates_open, context['board']['transforms']['gates_open'] )
     clue_limit = constraints.location_clues_constraint( new_clue_desc['defaults'][2], transformers.inc_clue, new_clue_desc['transforms'][2] )
@@ -47,7 +51,7 @@ def mythos( context ):
                 # add gate to location
                 context['locations']['transforms'][ new_gate_desc['index'] ][2].append( transformers.add_gate )
                 # remove all clues from that location:
-                for n in range( currency.current_location_status( new_gate_desc['defaults'][2], new_gate_desc['transforms'][2] )[0] ):
+                for n in range( currency.location_status( new_gate_desc['defaults'][2], new_gate_desc['transforms'][2] )[0] ):
                     context['locations']['transforms'][ new_gate_desc['index'] ][2].append( transformers.dec_clue )
                 # increase gates on board
                 context['board']['transforms']['gates_open'].append( transformers.inc_gates_open )
@@ -72,4 +76,72 @@ def mythos( context ):
     elif draw_gate == 2:
         print( 'A monster surge!' )
 
+    print( "\x1b[3;38;5;250mType 'next phase' to move on to UPKEEP...\x1b[23;38;5;70m\n\n" )
 
+    # set bookkeeping flag to false
+    context['board']['transforms']['bookkeeping'].append( transformers.toggle_bookkeeping )
+
+
+def upkeep( context ):
+    """ Performs Upkeep phase bookkeeping """    
+
+    print( f'\n\n\x1b[1;38;5;191m{'*'*50}  UPKEEP  {'*'*50}\x1b[22;38;5;70m\n')
+    # remind the player to refresh items manually
+    print( '\x1b[3;38;5;250mRemember to refresh your items...\x1b[23;38;5;70m\n\n' )
+
+    conditions = ic( context['investigator']['conditions'] )
+    
+    # check if not delayed and lost in time & space 
+
+    lost = upkeep_funcs.lost_in_time_space( conditions )
+
+    if lost:
+        lost( context )
+
+    # check for blessing/curse and 1/6 chance
+        
+    blessed_cursed = upkeep_funcs.blessing_curse( conditions )
+
+    if blessed_cursed:
+        blessed_cursed( context )
+    
+    # check for retainer, then check for loss ( 1/6 chance )
+    
+    retainer = upkeep_funcs.retainer( conditions )
+
+    if retainer:
+        retainer( context )
+
+    # check for bankruptcy/loan, in arkham and 1/2 chance
+    
+    bank_loan = upkeep_funcs.bank_loan( conditions )
+
+    if bank_loan:
+        bank_loan( context )
+
+
+    ## update context reflect any changes
+    context['investigator']['possessions'] = ic( currency.possessions( context['investigator']['defaults'][12], context['investigator']['transforms'][12] ) )
+    context['investigator']['conditions'] = ic( currency.condtions( context['investigator']['defaults'][3], context['investigator']['transforms'][3] ) )
+
+    # announce focus point count
+    print( f'\x1b[3;38;5;250m{context['investigator']['nickname']} has {currency.skill( context['investigator']['defaults'][4], context['investigator']['transforms'][4] )[1]} focus point(s). Increase or decrease your skills with focus points.\x1b[23;38;5;250m' )
+    
+    # set bookkeeping flag to false
+    context['board']['transforms']['bookkeeping'].append( transformers.toggle_bookkeeping )
+
+    
+def movement( context ):
+
+    # set bookkeeping flag to false
+    context['board']['transforms']['bookkeeping'].append( transformers.toggle_bookkeeping )
+
+def encounters( context ):
+
+    # set bookkeeping flag to false
+    context['board']['transforms']['bookkeeping'].append( transformers.toggle_bookkeeping )
+
+        
+    
+
+phase_funcs = [ mythos, upkeep, movement, encounters ]
