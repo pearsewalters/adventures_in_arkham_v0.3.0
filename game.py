@@ -1,23 +1,35 @@
-import traceback, phases, currency, transformers, board, investigator, monsters, locations, weapons, commands, tools
+import traceback, phases, currency, transformers, weapons, commands, tools, constraints
+from params import DEBUG, DEBUG_LVL
+from tables import constants, defaults, transformations
+from tools import Table, adjacencies
 
 from icecream import ic
+
+## debugging
+if not DEBUG or DEBUG_LVL < 0:
+    ic.disable()
+
 
 # game defaults
 
 INVESTIGATORS = [ "Sister Mary" ]
 ANCIENT_ONE = "Azathoth"
 
+# location matrix
+locations = {}
+locations['all_neighbors'], locations['left_neighbors'], locations['right_neighbors'] = adjacencies( 'locations.csv' )
+
 def azathoth_rules():
     """Apply ancient one rules for Azathoth"""
     # maniacs have their toughness increased by 1
-    for row in monsters.monster_transforms[1:]:
+    for row in transformations.monsters[1:]:
         if row[0] == 'Maniac':
-            row[ 3 ].append( monsters.inc_toughness )
+            row[ 3 ].append( transformers.inc_toughness )
             break
     # doom track is set to 14
     doom_track = 14
     while doom_track:
-        board.board_transforms['doom_track'].append( transformers.dec_doom_track )
+        transformations.board['doom_track'].append( transformers.dec_doom_track )
         doom_track -= 1
 
 
@@ -29,16 +41,15 @@ ancient_one_rules = {
 
 # set investigators
 for inv in INVESTIGATORS:
-    board.board_transforms['investigators'].append( ( transformers.add_investigator, inv ) )
+    transformations.board['investigators'].append( ( transformers.add_investigator, inv ) )
     # set win condition
-    board.board_transforms['win_cond'].append( transformers.inc_gates_closed_to_win )
+    transformations.board['win_cond'].append( transformers.inc_gates_closed_to_win )
     
 
 # set ancient one and apply rules
-board.board_transforms['ancient_one'].append( ( transformers.set_ancient_one, ANCIENT_ONE ) )
+transformations.board['ancient_one'].append( ( transformers.set_ancient_one, ANCIENT_ONE ) )
 
 ancient_one_rules[ ANCIENT_ONE ]()
-
 
 
 
@@ -63,8 +74,8 @@ def current_locations_desc( defaults, transforms ):
     for index,value in enumerate(defaults[1:]):
         loc_descs.append([
             value[0],
-            currency.current_location_occupants( value[1], transforms[index+1][1] ),
-            currency.current_location_status( value[2], transforms[index+1][2] )
+            currency.location_occupants( value[1], transforms[index+1][1] ),
+            currency.location_status( value[2], transforms[index+1][2] )
         ])
     return loc_descs
 
@@ -73,7 +84,7 @@ def monster_defs_trans( mon, mons ):
     return location_defs_trans( mon, mons )
 
 def monster_dimension( monster ):
-    for mon in monsters.monster_constants:
+    for mon in constants.monsters:
         if mon[0] == monster:
             return mon[1]
         
@@ -83,17 +94,17 @@ def awaken_the_ancient_one():
     return False
 
 def add_doom():
-    if board.current_doom_track( board.board_defaults['doom_track'], board.board_transforms['doom_track'] ) + 1 == 0:
+    if currency.doom_track( defaults.board['doom_track'], transformations.board['doom_track'] ) + 1 == 0:
         return awaken_the_ancient_one()
     else:
-        board.board_transforms['doom_track'].append( board.inc_doom_track )
+        transformations.board['doom_track'].append( transformers.inc_doom_track )
         return True
     
         
 def increase_terror_track():
 
-    board.board_transforms['terror_track'].append( board.inc_terror_track )
-    terror_track = board.current_terror_track( board.board_defaults['terror_track'], board.board_transforms['terror_track'] )
+    transformations.board['terror_track'].append( transformers.inc_terror_track )
+    terror_track = currency.terror_track( defaults.board['terror_track'], transformations.board['terror_track'] )
 
     print( 'The terror has increased!' )
 
@@ -105,16 +116,16 @@ def increase_terror_track():
         add_doom()
     elif terror_track >= 10:
         # remove the monster limit
-        board.board_transforms['monster_limit'].append( board.remove_monster_limit )
-    elif terror_track >= 9 and locations.location_closed_constraint( magick_shoppe['defaults'][2], locations.mark_closed, magick_shoppe['transforms'][2] ):
+        transformations.board['monster_limit'].append( transformers.remove_monster_limit )
+    elif terror_track >= 9 and constraints.location_closed_constraint( magick_shoppe['defaults'][2], transformers.mark_closed, magick_shoppe['transforms'][2] ):
         # close ye olde magick shoppe
-        magick_shoppe['transforms'][2].append( locations.mark_closed )
-    elif terror_track >= 6 and locations.location_closed_constraint( curiositie['defaults'][2], locations.mark_closed, curiositie['transforms'][2] ):
+        magick_shoppe['transforms'][2].append( transformers.mark_closed )
+    elif terror_track >= 6 and constraints.location_closed_constraint( curiositie['defaults'][2], transformers.mark_closed, curiositie['transforms'][2] ):
         # close curiositie shoppe
-        curiositie['transforms'][2].append( locations.mark_closed )
-    elif terror_track >= 3 and locations.location_closed_constraint( general['defaults'][2], locations.mark_closed, general['transforms'][2] ):
+        curiositie['transforms'][2].append( transformers.mark_closed )
+    elif terror_track >= 3 and constraints.location_closed_constraint( general['defaults'][2], transformers.mark_closed, general['transforms'][2] ):
         # close general store
-        general['transforms'][2].append( locations.mark_closed )
+        general['transforms'][2].append( transformers.mark_closed )
 
     # no matter what, remove an ally from the game
     print( 'Margie, pack your bags!' )
@@ -122,44 +133,44 @@ def increase_terror_track():
 
 def add_monster( location ):
 
-    new_monster = tools.rand_from_distro( monsters.current_frequencies( monsters.monster_cup_defaults, monsters.monster_cup_transforms ) )
+    new_monster = tools.rand_from_distro( currency.frequencies( defaults.monster_cup, transformations.monster_cup ) )
 
-    too_many_monsters = board.too_many_monsters_constraint( board.board_defaults['monster_limit'], board.inc_monster_count, board.board_transforms['monster_limit'] )
+    too_many_monsters = constraints.too_many_monsters_constraint( defaults.board['monster_limit'], transformers.inc_monster_count, transformations.board['monster_limit'] )
 
     if too_many_monsters == 1:
         print( f'A {new_monster} has appeared!' )
         # add monster to location
-        location['transforms'][1].append( ( locations.add_occupant, new_monster ) )
+        location['transforms'][1].append( ( transformers.add_occupant, new_monster ) )
         # update monster cup frequency
-        monsters.monster_cup_transforms.append( ( monsters.dec_freq, new_monster ) )
+        transformations.monster_cup.append( ( transformers.dec_freq, new_monster ) )
         # update monster count on board
-        board.board_transforms['monster_limit'].append( board.inc_monster_count )
+        transformations.board['monster_limit'].append( transformers.inc_monster_count )
         
     elif too_many_monsters == 2:
         # announce
         print( 'Too many monsters!' )
         # write over the location
-        location = location_defs_trans( 'OUTSKIRTS', zip( locations.location_defaults, locations.location_transforms ) )
+        location = location_defs_trans( 'OUTSKIRTS', zip( defaults.locations, transformations.locations ) )
         # check outskirts constraint
-        outskirts_full = board.outskirts_full_constraint( board.board_defaults['outskirts_limit'], board.inc_outskirts_count, board.board_transforms['outskirts_limit'] )
+        outskirts_full = constraints.outskirts_full_constraint( defaults.board['outskirts_limit'], transformers.inc_outskirts_count, transformations.board['outskirts_limit'] )
         if outskirts_full == 1:
             # add monster to outskirts
-            location['transforms'][1].append( ( locations.add_occupant, new_monster ) )
+            location['transforms'][1].append( ( transformers.add_occupant, new_monster ) )
             # increase outskirts count
-            board.board_transforms['outskirts_limit'].append( board.inc_outskirts_count )
+            transformations.board['outskirts_limit'].append( transformers.inc_outskirts_count )
         elif outskirts_full == 2:
             print( 'The outskirts are teeming with monsters!' )
             # empty the outskirts
-            for mon in locations.current_location_occupants( location['defaults'][1], location['transforms'][1] ):
+            for mon in currency.location_occupants( location['defaults'][1], location['transforms'][1] ):
                 # remove monster
-                location['transforms'].append( (locations.remove_occupant, mon ) )
+                location['transforms'].append( (transformers.remove_occupant, mon ) )
                 # update monster cup frequency
-                monsters.monster_cup_transforms.append( ( monsters.inc_freq, mon ) )
+                transformations.monster_cup.append( ( transformers.inc_freq, mon ) )
             # increase terror track
             increase_terror_track()
         
     # update monster locations by dimension
-    board.board_transforms['monster_locations'].append( ( board.add_monster_location, monster_dimension( new_monster ), location['id'] ) ) 
+    transformations.board['monster_locations'].append( ( transformers.add_monster_location, monster_dimension( new_monster ), location['id'] ) ) 
 
 def arkham_locations( locs ):
     for loc in locs:
@@ -167,7 +178,7 @@ def arkham_locations( locs ):
             yield loc
 
 def location_occupants_of_dimension( loc_id, dim ):
-    for occupant in locations.current_location_occupants( locations.location_defaults[loc_id][1], locations.location_transforms[loc_id][1] ):
+    for occupant in currency.location_occupants( defaults.locations[loc_id][1], transformations.locations[loc_id][1] ):
         if monster_dimension( occupant ) == dim:
             yield occupant
 
@@ -180,10 +191,10 @@ def normal_monster_move( monster, adj_matrix, dim, loc ):
     # find adjacency
     adj = adj_matrix[loc].index( 1 )
     # remove current location from index
-    board.board_transforms['monster_locations'].append( (board.remove_monster_location, dim, loc ) )
+    transformations.board['monster_locations'].append( (transformers.remove_monster_location, dim, loc ) )
     # add future location to index
-    board.board_transforms['monster_locations'].append( (board.add_monster_location, dim, adj ) )
-    print( f'{monster} has moved from {locations.all_neighbors[loc][0]} to {locations.all_neighbors[adj][0]}.')
+    transformations.board['monster_locations'].append( (transformers.add_monster_location, dim, adj ) )
+    print( f'{monster} has moved from {locations['all_neighbors'][loc][0]} to {locations['all_neighbors'][adj][0]}.')
     
 def fast_monster_move( monster, adj_matrix, dim, loc ):
     """This is normal monster movement with the square of the adjacency matrix"""
@@ -234,112 +245,161 @@ def move_monsters():
         5 : hound_monster_move
     }
 
-    for dim, locs in enumerate( board.current_monst_locs_by_dim( board.board_defaults['monster_locations'], board.board_transforms['monster_locations' ] ) ): 
+    for dim, locs in enumerate( currency.monst_locs_by_dim( defaults.board['monster_locations'], transformations.board['monster_locations' ] ) ): 
         if dim in move_left and len( locs ):
             for occupant, loc_id in arkham_location_occupants_of_dimension( locs, dim ):
                 # check monster movement rule
-                monster_in_situ = monster_defs_trans( occupant, zip( monsters.monster_defaults, monsters.monster_transforms ) )
-                mvmt_rule = monsters.current_rules( monster_in_situ['defaults'][1], monster_in_situ['transforms'][1] )[0]
-                rules[mvmt_rule](occupant, locations.left_neighbors, dim, loc_id )   
+                monster_in_situ = monster_defs_trans( occupant, zip( defaults.monsters, transformations.monsters ) )
+                mvmt_rule = currency.monster_rules( monster_in_situ['defaults'][1], monster_in_situ['transforms'][1] )[0]
+                rules[mvmt_rule](occupant, locations['left_neighbors'], dim, loc_id )   
         elif dim in move_right and len( locs ):
             for occupant, loc_id in arkham_location_occupants_of_dimension( locs, dim ):
                 # check monster movement rule
-                monster_in_situ = monster_defs_trans( occupant, zip( monsters.monster_defaults, monsters.monster_transforms ) )
-                mvmt_rule = monsters.current_rules( monster_in_situ['defaults'][1], monster_in_situ['transforms'][1] )[0]
-                rules[mvmt_rule](occupant, locations.right_neighbors, dim, loc_id )
+                monster_in_situ = monster_defs_trans( occupant, zip( defaults.monsters, transformations.monsters ) )
+                mvmt_rule = currency.monster_rules( monster_in_situ['defaults'][1], monster_in_situ['transforms'][1] )[0]
+                rules[mvmt_rule](occupant, locations['right_neighbors'], dim, loc_id )
         
 def investigator_dict( inv ):
-    index = [ row[0] for row in investigator.investigator_constants ].index( inv )
+    index = [ row[0] for row in constants.investigators ].index( inv )
     return {
         'name' : inv,
-        'nickname' : investigator.investigator_constants[index][1],
-        'occupation' : investigator.investigator_constants[index][2],
-        'home' : investigator.investigator_constants[index][3],
-        'ability_name' : investigator.investigator_constants[index][4],
-        'ability_desc' : investigator.investigator_constants[index][5],
-        'story' : investigator.investigator_constants[index][6],
-        'damage' : currency.current_stat( investigator.investigator_defaults[index][1], investigator.investigator_transforms[index][1] ),
-        'horror' : currency.current_stat( investigator.investigator_defaults[index][2], investigator.investigator_transforms[index][2] ),
-        'conditions' : currency.current_condtions( investigator.investigator_defaults[index][3], investigator.investigator_transforms[index][3] ),
-        'focus' : currency.current_skill( investigator.investigator_defaults[index][4], investigator.investigator_transforms[index][4] ),
-        'speed' : currency.current_skill( investigator.investigator_defaults[index][5], investigator.investigator_transforms[index][5] ),
-        'sneak' : currency.current_complement_skill( investigator.investigator_defaults[index][5], investigator.investigator_transforms[index][5] ),
-        'fight' : currency.current_skill( investigator.investigator_defaults[index][6], investigator.investigator_transforms[index][6] ),
-        'will' : currency.current_complement_skill( investigator.investigator_defaults[index][6], investigator.investigator_transforms[index][6] ),
-        'lore' : currency.current_skill( investigator.investigator_defaults[index][7], investigator.investigator_transforms[index][7] ),
-        'luck' : currency.current_complement_skill( investigator.investigator_defaults[index][7], investigator.investigator_transforms[index][7] ),
-        'location' : currency.current_inv_location( investigator.investigator_defaults[index][8], investigator.investigator_transforms[index][8] ),
-        'hands' : currency.current_equipment( investigator.investigator_defaults[index][10], investigator.investigator_transforms[index][10] )[0],
-        'equipped_items' : currency.current_equipment( investigator.investigator_defaults[index][10], investigator.investigator_transforms[index][10] )[1],
-        'exhausted_items' : currency.current_exhausted( investigator.investigator_defaults[index][11], investigator.investigator_transforms[index][11]),
-        'possessions' : currency.current_possessions( investigator.investigator_defaults[index][12], investigator.investigator_transforms[index][12] ),
-        'constants' : investigator.investigator_constants[index],
-        'defaults' : investigator.investigator_defaults[index],
-        'transforms' : investigator.investigator_transforms[index]
+        'nickname' : constants.investigators[index][1],
+        'occupation' : constants.investigators[index][2],
+        'home' : constants.investigators[index][3],
+        'ability_name' : constants.investigators[index][4],
+        'ability_desc' : constants.investigators[index][5],
+        'story' : constants.investigators[index][6],
+        'damage' : currency.stat( defaults.investigators[index][1], transformations.investigators[index][1] ),
+        'horror' : currency.stat( defaults.investigators[index][2], transformations.investigators[index][2] ),
+        'conditions' : currency.condtions( defaults.investigators[index][3], transformations.investigators[index][3] ),
+        'focus' : currency.skill( defaults.investigators[index][4], transformations.investigators[index][4] ),
+        'speed' : currency.skill( defaults.investigators[index][5], transformations.investigators[index][5] ),
+        'sneak' : currency.complement_skill( defaults.investigators[index][5], transformations.investigators[index][5] ),
+        'fight' : currency.skill( defaults.investigators[index][6], transformations.investigators[index][6] ),
+        'will' : currency.complement_skill( defaults.investigators[index][6], transformations.investigators[index][6] ),
+        'lore' : currency.skill( defaults.investigators[index][7], transformations.investigators[index][7] ),
+        'luck' : currency.complement_skill( defaults.investigators[index][7], transformations.investigators[index][7] ),
+        'location' : currency.inv_location( defaults.investigators[index][8], transformations.investigators[index][8] ),
+        'hands' : currency.equipment( defaults.investigators[index][10], transformations.investigators[index][10] )[0],
+        'equipped_items' : currency.equipment( defaults.investigators[index][10], transformations.investigators[index][10] )[1],
+        'exhausted_items' : currency.exhausted( defaults.investigators[index][11], transformations.investigators[index][11]),
+        'possessions' : currency.possessions( defaults.investigators[index][12], transformations.investigators[index][12] ),
+        'constants' : constants.investigators[index],
+        'defaults' : defaults.investigators[index],
+        'transforms' : transformations.investigators[index]
     }
 
 # create context for the game frames
 mythos_context = {
     'board' : {
         'phase' : 0,
-        'defaults' : board.board_defaults,
-        'transforms' : board.board_transforms
+        'defaults' : defaults.board,
+        'transforms' : transformations.board
     },
     'locations' : {
-        'constants' : locations.location_constants,
-        'defaults' : locations.location_defaults,
-        'transforms' : locations.location_transforms,
-        'currents' : current_locations_desc( locations.location_defaults, locations.location_transforms ),
+        'constants' : constants.locations,
+        'defaults' : defaults.locations,
+        'transforms' : transformations.locations,
+        'currents' : current_locations_desc( defaults.locations, transformations.locations ),
     }
 }
 
+phase_bookkeeping = {
+    0 : phases.mythos,
+    1 : phases.upkeep,
+    2 : phases.movement,
+    3 : phases.encounters
+}
 
-# initiate game with first mythos phase
 
-phases.mythos( mythos_context )
-commands.next_phase( mythos_context, "phase" )
+
 
 # begin game loop
 
 while True:
-    
-    ## pull context into loop
+
+
+    ## set context for loop
     context = {
         'board' : {
-            'phase' : currency.current_phase( board.board_defaults['current_phase'], board.board_transforms['current_phase'] ),
-            'win' : currency.current_win_condition( board.board_defaults['win_cond'], board.board_transforms['win_cond'] ),
-            'gates_open' : currency.current_gates_open( board.board_defaults['gates_open'], board.board_transforms['gates_open'] ),
-            'defaults' : board.board_defaults,
-            'transforms' : board.board_transforms
+            'phase' : currency.phase( defaults.board['current_phase'], transformations.board['current_phase'] ),
+            'bookkeeping' : currency.bookkeeping( defaults.board['bookkeeping'], transformations.board['bookkeeping'] ),
+            'win' : currency.win_condition( defaults.board['win_cond'], transformations.board['win_cond'] ),
+            'gates_open' : currency.gates_open( defaults.board['gates_open'], transformations.board['gates_open'] ),
+            'defaults' : defaults.board,
+            'transforms' : transformations.board
         },
         'locations' : {
-            'constants' : locations.location_constants,
-            'defaults' : locations.location_defaults,
-            'transforms' : locations.location_transforms,
-            'currents' : current_locations_desc( locations.location_defaults, locations.location_transforms ),
-            'graph' : locations.all_neighbors,
+            'constants' : constants.locations,
+            'defaults' : defaults.locations,
+            'transforms' : transformations.locations,
+            'currents' : current_locations_desc( defaults.locations, transformations.locations ),
+            'graph' : locations['all_neighbors'],
         },
-        'investigator' : investigator_dict( currency.current_investigators(
-            board.board_defaults['investigators'], board.board_transforms['investigators']
-        )[ currency.current_player( board.board_defaults['current_player'], board.board_transforms['current_player'] ) ] ),
+        'investigator' : investigator_dict( currency.investigators(
+            defaults.board['investigators'], transformations.board['investigators']
+        )[ currency.player( defaults.board['current_player'], transformations.board['current_player'] ) ] ),
         'weapons' : {
+            'constants' : constants.weapons,
+            'defaults' : defaults.weapons,
+            'transforms' : transformations.weapons,
+            'deck_defaults' : defaults.weapons_deck,
+            'deck_transforms' : transformations.weapons_deck
+        },
+        'consumables' : {
             'constants' : weapons.constants,
             'defaults' : weapons.defaults,
+            'transforms' : weapons.transforms,
+            'deck_defaults' : weapons.deck_defaults,
+            'deck_transforms' : weapons.deck_transforms
+        },
+        'tomes' : {
+            'constants' : weapons.constants,
+            'defaults' : weapons.defaults,
+            'transforms' : weapons.transforms,
+            'deck_defaults' : weapons.deck_defaults,
+            'deck_transforms' : weapons.deck_transforms
+        },
+        'passive_buffs' : {
+            'constants' : weapons.constants,
+            'defaults' : weapons.defaults,
+            'transforms' : weapons.transforms,
+            'deck_defaults' : weapons.deck_defaults,
+            'deck_transforms' : weapons.deck_transforms
+        },
+        'active_buffs' : {
+            'constants' : weapons.constants,
+            'defaults' : weapons.defaults,
+            'transforms' : weapons.transforms,
+            'deck_defaults' : weapons.deck_defaults,
+            'deck_transforms' : weapons.deck_transforms
+        },
+        'oddites' : {
+            'constants' : weapons.constants,
+            'defaults' : weapons.defaults,
+            'transforms' : weapons.transforms,
+            'deck_defaults' : weapons.deck_defaults,
+            'deck_transforms' : weapons.deck_transforms
         }
     }
+    
 
     ## check for win condition
     if context['board']['win'][0] == 0 and context['board']['gates_open'] == 0:
         print(f'\x1b[38;5;70m\n\n{" "*20}The ancient one is banished! You\'ve saved Arkham and the world!\n\n' )
         break
 
+    ## phase bookkeeping
+    if context['board']['bookkeeping'] and phase_bookkeeping[ context['board']['phase'] ]:
+        phase_bookkeeping[ context['board']['phase'] ]( context )
+
     val_com = { k:v for k,v in commands.phase_commands[ context['board']['phase'] ].items() }
     val_com.update( commands.anytime_commands )
 
     sentence = input( f'\x1b[38;5;70m>>> ' ).strip().lower().split(' ')
     print('\n')
-    command = sentence[0]
-    arguments = sentence[1:]
+    command = ic( sentence[0] )
+    arguments = ic( sentence[1:] )
 
     if command not in val_com:
         print( 'Hmm...unsure what you want. Try again. Type "commands" to see a list of valid commands.' )
@@ -351,14 +411,12 @@ while True:
     else:
         try:
             if len( arguments ):
-                msg = val_com[command][0]( context, *arguments )
+                msg = val_com[command][0]( context, *arguments ) 
             else:
                 msg = val_com[command][0]( context )
             # if command returns a message, print it 
             if msg:
                 print( f'\x1b[38;5;70m{msg}' )
         except TypeError as error:
-
-            traceback.print_tb(  )
-            
+            traceback.print_tb( None )
             print( f'ERROR: {error}' )
