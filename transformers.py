@@ -1,3 +1,23 @@
+import tools
+import functools, inspect
+from icecream import ic
+from params import DEBUG, DEBUG_LVL
+
+def debug( debug_lvl=0, debug=DEBUG ):
+    def debug_dec( func ):
+        @functools.wraps( func )
+        def wrapper( *args, **kwargs ):
+                if debug and DEBUG_LVL >= debug_lvl:
+                    called = func.__name__
+                    msg = f'DEBUG: \n   called: {called}\ndebug level: {debug_lvl}'
+                    print( msg )
+                return func( *args, **kwargs )
+        return wrapper
+    return debug_dec
+
+if not DEBUG or DEBUG_LVL < 1:
+    ic.disable()
+
 
 # locations 
 
@@ -95,16 +115,16 @@ def add_delay( matrix ):
 def remove_delay( matrix ):
     return [ c-1 if matrix.index(c) == 0 else c for c in matrix if matrix ]
 
-def add_arrest( matrix ):
+def add_lost( matrix ):
     return [ c+1 if matrix.index(c) == 1 else c for c in matrix if matrix ]
 
-def remove_arrest( matrix ):
+def remove_lost( matrix ):
     return [ c-1 if matrix.index(c) == 1 else c for c in matrix if matrix ]
 
-def add_lost( matrix ):
+def add_arrest( matrix ):
     return [ c+1 if matrix.index(c) == 2 else c for c in matrix if matrix ]
 
-def remove_lost( matrix ):
+def remove_arrest( matrix ):
     return [ c-1 if matrix.index(c) == 2 else c for c in matrix if matrix ]
 
 def add_retainer( matrix ):
@@ -119,6 +139,9 @@ def add_bank_loan( matrix ):
 def remove_bank_loan( matrix ):
     return [ c-1 if matrix.index(c) == 4 else c for c in matrix if matrix ]
 
+def set_bankrupt( vector ):
+    return [ float('inf') if i == 4 else v for i,v in enumerate(vector) ]
+
 def add_stl_membership( matrix ):
     return [ c+1 if matrix.index(c) == 5 else c for c in matrix if matrix ]
 
@@ -131,8 +154,8 @@ def add_deputy( matrix ):
 def remove_deputy( matrix ):
     return [ c-1 if matrix.index(c) == 6 else c for c in matrix if matrix ]
 
-def add_blessing( matrix ):
-    return [ c+1 if matrix.index(c) == 7 else c for c in matrix if matrix ]
+def add_blessing( vector ):
+    return ic( [ (v+1)*2 if i == 7 else v for i,v in enumerate(vector) ] )
 
 def remove_blessing( matrix):
     return [ c-1 if matrix.index(c) == 7 else c for c in matrix if matrix ]
@@ -377,29 +400,47 @@ def add_item( dictionary, variety, item ):
 def remove_item( dictionary, variety, item ):
     return { k:( v[:v.index(item)] + v[v.index(item)+1:] if k == variety else v) for k,v in dictionary.items() }
 
-def add_common_item( dictionary, item ):
-    return add_item( dictionary, 'common', item )
+def add_weapon( dictionary, item ):
+    return add_item( dictionary, 'weapons', item )
+    
+def remove_weapon_item( dictionary, item ):
+    return remove_item( dictionary, 'weapons', item )
 
-def remove_common_item( dictionary, item ):
-    return remove_item( dictionary, 'common', item )
+def add_consumable_item( dictionary, item ):
+    return add_item( dictionary, 'consumables', item )
 
-def add_unique_item( dictionary, item ):
-    return add_item( dictionary, 'unique', item )
+def remove_consumable_item( dictionary, item ):
+    return remove_item( dictionary, 'consumables', item )
 
-def remove_unique_item( dictionary, item ):
-    return remove_item( dictionary, 'unique', item )
+def add_tome_item( dictionary, item ):
+    return add_item( dictionary, 'tomes', item )
+
+def remove_tome_item( dictionary, item ):
+    return remove_item( dictionary, 'tomes', item )
+
+def add_passive_buff( dictionary, item ):
+    return add_item( dictionary, 'passive_buffs', item )
+
+def remove_passive_buff( dictionary, item ):
+    return remove_item( dictionary, 'passive_buffs', item )
+
+def add_active_buff( dictionary, item ):
+    return add_item( dictionary, 'active_buffs', item )
+
+def remove_active_buff( dictionary, item ):
+    return remove_item( dictionary, 'active_buffs', item )
+
+def add_oddity_item( dictionary, item ):
+    return add_item( dictionary, 'oddities', item )
+
+def remove_oddity_item( dictionary, item ):
+    return remove_item( dictionary, 'oddities', item )
 
 def add_spell( dictionary, spell ):
     return add_item( dictionary, 'spells', spell )
 
 def remove_spell( dictionary, spell ):
     return remove_item( dictionary, 'spells', spell )
-
-def add_buff( dictionary, buff  ):
-    return add_item( dictionary, 'buffs', buff )
-
-def remove_buff( dictionary, buff ):
-    return remove_item( dictionary, 'buffs', buff )
 
 def add_ally( dictionary, ally ):
     return add_item( dictionary, 'allies', ally )
@@ -417,6 +458,9 @@ def remove_investigator( vector, investigator ):
 
 def advance_current_phase( integer ):
     return (integer + 1) % 4
+
+def toggle_bookkeeping( integer ):
+    return (integer + 1) % 2
 
 def set_ancient_one( vector, ancient_one ):
     return vector + [ ancient_one ]
@@ -488,3 +532,160 @@ def add_monster_location( vector, dimension, location ):
 
 def remove_monster_location( vector, dimension, location ):
     return [ locs[:locs.index(location)] + locs[locs.index(location)+1:] if dim == dimension else locs for dim, locs in enumerate( vector ) ]
+
+
+# weapons
+
+def increase( vector, dimension ):
+    """ Increases a dimension in a vector by 1 """
+    return [ v+1 if i == dimension else v for i,v in enumerate(vector) ]
+
+def decrease( vector, dimension ):
+    """ Decreases a dimension in a vector by 1 """
+    return [ v-1 if i == dimension else v for i,v in enumerate(vector) ]
+
+def cycle( vector, dimension, mod ):
+    """ Cycles a dimension in a vector from 0 through mod-1 """
+    return [ (v+1)%mod if i == dimension else v for i,v in enumerate(vector) ]
+
+def change_modality( vector ):
+    """ Changes a physical weapon in a magical one, a magical into physical """
+    return cycle( vector, 0, 2 )
+
+def inc_bonus( vector ):
+    """ Increases weapon bonus """
+    return increase( vector, 1 )
+
+def dec_bonus( vector ):
+    """ Decreases weapon bonus """
+    return decrease( vector, 1 )
+
+def inc_san_cost( vector ):
+    """ Increases weapon sanity cost """
+    return increase( vector, 2 )
+
+def dec_san_cost( vector ):
+    """ Decrease weapon sanity cost """
+    return decrease( vector, 2 )
+
+def change_exhaust( vector ):
+    """ Makes a non-exhaustible weapon exhaustible, exhaustible to non """
+    return cycle( vector, 3, 2 )
+
+def change_losable( vector ):
+    """ Makes a non-losable weapon losable, losable to non """
+    return cycle( vector, 4 )
+
+def inc_price( vector ):
+    """ Increases the weapon price """
+    return increase( vector, 5 )
+
+def dec_price( vector ):
+    return decrease( vector, 5 )
+
+# transformers
+
+def set_movement_rules( rulset_vector, movement_rule ):
+    return [ movement_rule, rulset_vector[1], rulset_vector[2] ]
+
+def set_evade_rules( rulset_vector, evade_rule ):
+    return [ rulset_vector[0], evade_rule, rulset_vector[2] ]
+
+def set_combat_rules( rulset_vector, combat_rule ):
+    return [ rulset_vector[0], rulset_vector[1], combat_rule ]
+
+def add_ambush( abilities_vector ):
+    return [ a + 1 if i == 0 else a for i,a in enumerate( abilities_vector ) ]
+
+def remove_ambush( abilities_vector ):
+    return [ a - 1 if i == 0 else a for i,a in enumerate( abilities_vector ) ]
+
+def add_endless( abilities_vector ):
+    return [ a + 1 if i == 1 else a for i,a in enumerate( abilities_vector ) ]
+
+def remove_endless( abilities_vector ):
+    return [ a - 1 if i == 1 else a for i,a in enumerate( abilities_vector ) ]
+
+def add_undead( abilities_vector ):
+    return [ a + 1 if i == 2 else a for i,a in enumerate( abilities_vector ) ]
+
+def remove_undead( abilities_vector ):
+    return [ a - 1 if i == 2 else a for i,a in enumerate( abilities_vector ) ]
+
+def add_physical_resistance( abilities_vector ):
+    return [ a + 0.5 if i == 3 else a for i,a in enumerate( abilities_vector ) ]
+
+def remove_physical_resistance( abilities_vector ):
+    return [ a - 0.5 if i == 3 else a for i,a in enumerate( abilities_vector ) ]
+
+def add_physical_immunity( abilities_vector ):
+    return [ a + 1 if i == 3 else a for i,a in enumerate( abilities_vector ) ]
+
+def remove_physical_immunity( abilities_vector ):
+    return [ a - 1 if i == 3 else a for i,a in enumerate( abilities_vector ) ]
+
+def add_magical_resistance( abilities_vector ):
+    return [ a + 0.5 if i == 4 else a for i,a in enumerate( abilities_vector ) ]
+
+def remove_magical_resistance( abilities_vector ):
+    return [ a - 0.5 if i == 4 else a for i,a in enumerate( abilities_vector ) ]
+
+def add_magical_immunity( abilities_vector ):
+    return [ a + 1 if i == 4 else a for i,a in enumerate( abilities_vector ) ]
+
+def remove_magical_immunity( abilities_vector ):
+    return [ a - 1 if i == 4 else a for i,a in enumerate( abilities_vector ) ]
+
+def inc_nightmarish( abilities_vector ):
+    return [ a + 1 if i == 5 else a for i,a in enumerate( abilities_vector ) ]
+
+def dec_nightmarish( abilities_vector ):
+    return [ a - 1 if i == 5 else a for i,a in enumerate( abilities_vector ) ]
+
+def inc_overwhelming( abilities_vector ):
+    return [ a + 1 if i == 6 else a for i,a in enumerate( abilities_vector ) ]
+
+def dec_overwhelming( abilities_vector ):
+    return [ a - 1 if i == 6 else a for i,a in enumerate( abilities_vector ) ]
+
+def inc_awareness( stats_vector ):
+    return [ s - 1 if i == 0 else s for i,s in enumerate( stats_vector ) ]
+
+def dec_awareness( stats_vector ):
+    return [ s + 1 if i == 0 else s for i,s in enumerate( stats_vector ) ]
+
+def inc_toughness( stats_vector ):
+    return [ s + 1 if i == 1 else s for i,s in enumerate( stats_vector ) ]
+
+def dec_toughness( stats_vector ):
+    return [ s - 1 if i == 1 else s for i,s in enumerate( stats_vector ) ]
+
+def inc_horror_rating( stats_vector ):
+    return [ s - 1 if i == 2 else s for i,s in enumerate( stats_vector ) ]
+
+def dec_horror_rating( stats_vector ):
+    return [ s + 1 if i == 2 else s for i,s in enumerate( stats_vector ) ]
+
+def inc_horror_damage( stats_vector ):
+    return [ s - 1 if i == 3 else s for i,s in enumerate( stats_vector ) ]
+
+def dec_horror_damage( stats_vector ):
+    return [ s + 1 if i == 3 else s for i,s in enumerate( stats_vector ) ]
+
+def inc_combat_rating( stats_vector ):
+    return [ s - 1 if i == 4 else s for i,s in enumerate( stats_vector ) ]
+
+def dec_combat_rating( stats_vector ):
+    return [ s + 1 if i == 4 else s for i,s in enumerate( stats_vector ) ]
+
+def inc_combat_damage( stats_vector ):
+    return [ s - 1 if i == 5 else s for i,s in enumerate( stats_vector ) ]
+
+def dec_combat_damage( stats_vector ):
+    return [ s + 1 if i == 5 else s for i,s in enumerate( stats_vector ) ]
+
+def inc_freq( dictionary, monster ):
+    return { m:f+1 if m.upper() == monster.upper() else f for m,f in dictionary.items() }
+
+def dec_freq( dictionary, monster ):
+    return { m:f-1 if m.upper() == monster.upper() else f for m,f in dictionary.items() }
