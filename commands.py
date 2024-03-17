@@ -1,4 +1,6 @@
-import time, transformers, constraints, phases, investigator
+import time, transformers, constraints, phases
+
+from params import DEBUG, DEBUG_LVL
 
 from icecream import ic
 
@@ -311,16 +313,102 @@ def refresh( context ):
 
     return f'{context['investigator']['nickname']} has refreshed their items'
 
+def increase( context, skill ):
+
+    skill_funcs = {
+        'speed' : ( transformers.inc_speed, "Speed is your overall quickness. It informs your movement points, as well as speed-based skill checks" ),
+        'sneak' : ( transformers.inc_sneak, "Sneak is your overall stealthiness. It informs how well you evade Monsters, as well as stealth-based skill checks" ),
+        'fight' : ( transformers.inc_fight, "Fight is your overall physical fitness. It informs how well you combat Monsters, as well as physical skill checks" ),
+        'will' : ( transformers.inc_will, "Will is your overall constitution. It informs how well you stomach the horror of each Monster, as well as will mental skill checks" ),
+        'lore' : ( transformers.inc_lore, "Lore is your overall undesrstanding of the Mythos. It informs how well you cast Spells, as well as other occult skill checks"),
+        'luck' : ( transformers.inc_luck , "Luck is how fortunate you are. It informs everything that wouldn't be covered by another skill. " )
+    }
+
+    if skill.lower() == 'args':
+        return show_args( skill_funcs )
+
+    enough_focus = constraints.focus_constraint( context['investigator']['defaults'][4], transformers.dec_focus, context['investigator']['transforms'][4] )
+
+    if not enough_focus:
+        return f"{context['investigator']['nickname']} doesn't have enough focus to adjust their skills" 
+
+    if skill not in skill_funcs:
+        return "Oops! That's not a real skill. Try again"
+    
+    if skill == 'speed' or skill == 'sneak':
+        can_inc = constraints.skills_constraint( context['investigator']['defaults'][5], skill_funcs[skill][0], context['investigator']['transforms'][5] )
+        if can_inc:
+            context['investigator']['transforms'][5].append( skill_funcs[skill][0] )
+        else:
+            return f"{context['investigator']['nickname']} can't increase their {skill} beyond the maximum"
+
+    if skill == 'fight' or skill == 'will':
+        can_inc = constraints.skills_constraint( context['investigator']['defaults'][6], skill_funcs[skill][0], context['investigator']['transforms'][6] )
+        if can_inc:
+            context['investigator']['transforms'][6].append( skill_funcs[skill][0] )
+        else:
+            return f"{context['investigator']['nickname']} can't increase their {skill} beyond the maximum"
+
+    if skill == 'lore' or skill == 'luck':
+        can_inc = constraints.skills_constraint( context['investigator']['defaults'][7], skill_funcs[skill][0], context['investigator']['transforms'][7] )
+        if can_inc:
+            context['investigator']['transforms'][7].append( skill_funcs[skill][0] )
+        else:
+            return f"{context['investigator']['nickname']} can't increase their {skill} beyond the maximum"
+
+    # decrease focus
+    context['investigator']['transforms'][4].append( transformers.dec_focus )
+    return f"{context['investigator']['nickname']} has increased their {skill}"
+
+def decrease( context, skill ):
+
+    skill_funcs = {
+        'speed' : ( transformers.dec_speed, "Speed is your overall quickness. It informs your movement points, as well as speed-based skill checks" ),
+        'sneak' : ( transformers.dec_sneak, "Sneak is your overall stealthiness. It informs how well you evade Monsters, as well as stealth-based skill checks" ),
+        'fight' : ( transformers.dec_fight, "Fight is your overall physical fitness. It informs how well you combat Monsters, as well as physical skill checks" ),
+        'will' : ( transformers.dec_will, "Will is your overall constitution. It informs how well you stomach the horror of each Monster, as well as will mental skill checks" ),
+        'lore' : ( transformers.dec_lore, "Lore is your overall understanding of the Mythos. It informs how well you cast Spells, as well as other occult skill checks"),
+        'luck' : ( transformers.dec_luck , "Luck is how fortunate you are. It informs everything that wouldn't be covered by another skill. " )
+    }
+
+    if skill.lower() == 'args':
+        return show_args( skill_funcs )
+
+    enough_focus = constraints.focus_constraint( context['investigator']['defaults'][4], transformers.dec_focus, context['investigator']['transforms'][4] )
+
+    if not enough_focus:
+        return f"{context['investigator']['nickname']} doesn't have enough focus to adjust their skills" 
+
+    if skill not in skill_funcs:
+        return "Oops! That's not a real skill. Try again"
+    
+    if skill == 'speed' or skill == 'sneak':
+        can_inc = constraints.skills_constraint( context['investigator']['defaults'][5], skill_funcs[skill][0], context['investigator']['transforms'][5] )
+        if can_inc:
+            context['investigator']['transforms'][5].append( skill_funcs[skill][0] )
+        else:
+            return f"{context['investigator']['nickname']} can't decrease their {skill} beyond the minimum"
+
+    if skill == 'fight' or skill == 'WILL':
+        can_inc = constraints.skills_constraint( context['investigator']['defaults'][6], skill_funcs[skill][0], context['investigator']['transforms'][6] )
+        if can_inc:
+            context['investigator']['transforms'][6].append( skill_funcs[skill][0] )
+        else:
+            return f"{context['investigator']['nickname']} can't decrease their {skill} beyond the minimum"
+
+    if skill == 'lore' or skill == 'luck':
+        can_inc = constraints.skills_constraint( context['investigator']['defaults'][7], skill_funcs[skill][0], context['investigator']['transforms'][7] )
+        if can_inc:
+            context['investigator']['transforms'][7].append( skill_funcs[skill][0] )
+        else:
+            return f"{context['investigator']['nickname']} can't decrease their {skill} beyond the minimum"
+
+    context['investigator']['transforms'][4].append( transformers.dec_focus )
+    return f"{context['investigator']['nickname']} has decreased their {skill}"
+
 def next_phase( context, *args ):
     """ Moves into the next phase of play """
     arg = ' '.join( [w.upper() for w in args] )
-
-    phase_funcs = {
-        0 : phases.mythos,
-        1 : None,
-        2 : None,
-        3 : None
-    }
 
     if arg != 'PHASE':
         return "Please say 'next phase' to advance to next phase. \x1b[1;38;5;191mHave you done everything for this phase before moving on?\x1b[22;38;5;70m\n"
@@ -329,6 +417,8 @@ def next_phase( context, *args ):
 
     # advance next phase
     context['board']['transforms']['current_phase'].append( transformers.advance_current_phase )
+    # set bookkeeping flag to true
+    context['board']['transforms']['bookkeeping'].append( transformers.toggle_bookkeeping )
     
     # inform the player
     print( f'Beginning the { phase_names[ (context['board']['phase'] + 1) % 4 ] } phase' ) 
@@ -350,7 +440,9 @@ anytime_commands = {
 phase_commands = {
     0 : {},
     1 : {
-        'refresh' : (refresh, "Readies any exhausted items")
+        'refresh' : (refresh, "Readies any exhausted items"),
+        'increase' : (increase, "Increase skill by one point"),
+        'decrease' : (decrease, "Decrease skill by one point") 
     },
     2 : {
         'move' : (move, "Bring up the move dialog to change locations")
@@ -359,3 +451,21 @@ phase_commands = {
 
     }
 }
+
+
+# for debugging 
+def debug( context, *args ):
+        try:
+            if args[0] == 'phase':
+                phases.phase_funcs[ int(args[1]) ]( context )
+            else:
+                ic()
+                val = eval( args[0] )
+                ic( args[0], val )
+        except Exception as error:
+            print( error )
+        return None
+
+if DEBUG and DEBUG_LVL >= 0:
+    print( 'True' )
+    anytime_commands.update( { 'debug' : (debug, "Debugger") } )
