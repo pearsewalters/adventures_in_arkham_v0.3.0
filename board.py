@@ -3,7 +3,8 @@
 board_defaults = {
     'investigators' : [  ],
     'current_player' : 0,
-    'current_phase' : 0,
+    'current_phase' : 1,
+    'bookkeeping' : 1,
     'ancient_one' : [ ],
     'doom_track' : 0,
     'terror_track' : 0,
@@ -22,6 +23,7 @@ board_transforms = {
     'investigators' : [ ],
     'current_player' : [ ],
     'current_phase' : [ ],
+    'bookkeeping' : [ ],
     'ancient_one' : [ ],
     'doom_track' : [ ],
     'terror_track' : [ ],
