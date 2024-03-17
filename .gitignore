@@ -1,0 +1,17 @@
+__pycache__/board.cpython-312.pyc
+__pycache__/commands.cpython-312.pyc
+__pycache__/constraints.cpython-312.pyc
+__pycache__/currency.cpython-312.pyc
+__pycache__/investigator.cpython-312.pyc
+__pycache__/locations.cpython-312.pyc
+__pycache__/monsters.cpython-312.pyc
+__pycache__/params.cpython-312.pyc
+__pycache__/phases.cpython-312.pyc
+__pycache__/tools.cpython-312.pyc
+__pycache__/transformers.cpython-312.pyc
+__pycache__/upkeep_funcs.cpython-312.pyc
+__pycache__/upkeep.cpython-312.pyc
+__pycache__/weapons.cpython-312.pyc
+tables/__pycache__/constants.cpython-312.pyc
+tables/__pycache__/defaults.cpython-312.pyc
+tables/__pycache__/transformations.cpython-312.pyc
