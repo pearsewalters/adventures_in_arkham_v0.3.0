@@ -1,469 +1,72 @@
-import tools
-import functools, inspect
 from icecream import ic
-from params import DEBUG, DEBUG_LVL
+from params import DEBUG_LVL
+from tools import debugger as db
 
-def debug( debug_lvl=0, debug=DEBUG ):
-    def debug_dec( func ):
-        @functools.wraps( func )
-        def wrapper( *args, **kwargs ):
-                if debug and DEBUG_LVL >= debug_lvl:
-                    called = func.__name__
-                    msg = f'DEBUG: \n   called: {called}\ndebug level: {debug_lvl}'
-                    print( msg )
-                return func( *args, **kwargs )
-        return wrapper
-    return debug_dec
 
-if not DEBUG or DEBUG_LVL < 1:
-    ic.disable()
+# generalizable functions
+def increase( vector, dimension ):
+    """ Increases a dimension in a vector by 1 """
+    return vector._replace(**{ dimension: getattr(vector,dimension) + 1} )
 
+def decrease( vector, dimension ):
+    """ Decreases a dimension in a vector by 1 """
+    return vector._replace(**{ dimension: getattr(vector,dimension) - 1} )
 
-# locations 
+def cycle_int( integer, mod ):
+    """ Cycles an integer up, 0 thru mod-1 """
+    return (integer + 1) % mod
 
-def add_occupant( vector, occupant ):
-    return vector + [ occupant ]
+def cycle( vector, dimension, mod ):
+    """ Cycles a dimension in a vector from 0 through mod-1 """
+    return vector._replace( **{ dimension : (getattr( vector, dimension) + 1) % mod } )
 
-def remove_occupant( vector, occupant ):
-    return vector[:vector.index(occupant)] + vector[vector.index(occupant)+1:]
+def add_to_list( l, element ):
+    return l + [ element ]
 
-def inc_clue( vector ):
-    return [ v + 1 if n == 0 else v for n,v in enumerate(vector) ]
+def remove_from_list( l, element ):
+    return l[ :l.index(element) ] + l[ l.index(element)+1: ]
 
-def dec_clue( vector ):
-    return [ v - 1 if n == 0 else v for n,v in enumerate(vector) ]
+def inc_freq( dictionary, key ):
+    return { m:f+1 if m.upper() == key.upper() else f for m,f in dictionary.items() }
 
-def inc_historical_clues( vector ):
-    return [ v + 1 if n == 1 else v for n,v in enumerate(vector) ]
+def dec_freq( dictionary, key ):
+    return { m:f-1 if m.upper() == key.upper() else f for m,f in dictionary.items() }
 
-def add_seal( vector ):
-    return [ v + 1 if n == 2 else v for n,v in enumerate(vector) ]
+def inc_max_skill( skill ):
+    db( 3 )
+    return increase( skill, 'max_'+skill )
 
-def remove_seal( vector ):
-    return [ v - 1 if n == 2 else v for n,v in enumerate(vector) ]
+def dec_max_skill( skill ):
+    db( 3 )
+    return decrease( skill, 'max_'+skill )
 
-def add_gate( vector ):
-    return [ v + 1 if n == 3 else v for n,v in enumerate(vector) ]
+def inc_current_skill( skill ):
+    db( 3 )
+    return increase( skill, 'current_'+skill )
 
-def remove_gate( vector ):
-    return [ v - 1 if n == 3 else v for n,v in enumerate(vector) ]
-
-def mark_explored( vector ):
-    return [ v + 1 if n == 4 else v for n,v in enumerate(vector) ]
-
-def mark_unexplored( vector ):
-    return [ v - 1 if n == 4 else v for n,v in enumerate(vector) ]
-
-def mark_closed( vector ):
-    return [ v + 1 if n == 5 else v for n,v in enumerate(vector) ]
-
-def mark_open( vector ):
-    return [ v + 1 if n == 5 else v for n,v in enumerate(vector) ]
-
-
-# investigators
-
-# health
-
-def inc_health_stat( matrix ):
-    return [ matrix[0], matrix[1] + 1, matrix[2] ]
-
-def dec_health_stat( matrix ):
-    return [ matrix[0], matrix[1] - 1, matrix[2] ]
-
-def inc_damage( matrix ):
-    return [ matrix[0], matrix[1] + 1, matrix[2] ]
-
-def dec_damage( matrix ):
-    return [ matrix[0], matrix[1] - 1, matrix[2] ]
-
-def inc_max_damage( matrix ):
-    return [ matrix[0] + 1, matrix[1], matrix[2] ]
-
-def dec_max_damage( matrix ):
-    return [ matrix[0] - 1, matrix[1], matrix[2] ]
-
-def inc_horror( matrix ):
-    return inc_damage( matrix )
-
-def dec_horror( matrix ):
-    return dec_damage( matrix )
-
-def inc_max_horror( matrix ):
-    return inc_max_damage( matrix )
-
-def dec_max_horror( matrix ):
-    return dec_max_damage( matrix )
-
-def set_uncon( matrix ):
-    return [ matrix[0], matrix[1], matrix[2] + 1 ]
-
-def set_con( matrix ):
-    return [ matrix[0], matrix[1], matrix[2] - 1 ]
-
-def set_insane( matrix ):
-    return set_uncon( matrix )
-
-def set_sane( matrix ):
-    return set_con( matrix )
-
-# conditions
-
-def add_delay( matrix ):
-    return [ c+1 if matrix.index(c) == 0 else c for c in matrix if matrix ]
-
-def remove_delay( matrix ):
-    return [ c-1 if matrix.index(c) == 0 else c for c in matrix if matrix ]
-
-def add_lost( matrix ):
-    return [ c+1 if matrix.index(c) == 1 else c for c in matrix if matrix ]
-
-def remove_lost( matrix ):
-    return [ c-1 if matrix.index(c) == 1 else c for c in matrix if matrix ]
-
-def add_arrest( matrix ):
-    return [ c+1 if matrix.index(c) == 2 else c for c in matrix if matrix ]
-
-def remove_arrest( matrix ):
-    return [ c-1 if matrix.index(c) == 2 else c for c in matrix if matrix ]
-
-def add_retainer( matrix ):
-    return [ c+1 if matrix.index(c) == 3 else c for c in matrix if matrix ]
-
-def remove_retainer( matrix ):
-    return [ c-1 if matrix.index(c) == 3 else c for c in matrix if matrix ]
-
-def add_bank_loan( matrix ):
-    return [ c+1 if matrix.index(c) == 4 else c for c in matrix if matrix ]
-
-def remove_bank_loan( matrix ):
-    return [ c-1 if matrix.index(c) == 4 else c for c in matrix if matrix ]
-
-def set_bankrupt( vector ):
-    return [ float('inf') if i == 4 else v for i,v in enumerate(vector) ]
-
-def add_stl_membership( matrix ):
-    return [ c+1 if matrix.index(c) == 5 else c for c in matrix if matrix ]
-
-def remove_stl_membership( matrix ):
-    return [ c-1 if matrix.index(c) == 5 else c for c in matrix if matrix ]
-
-def add_deputy( matrix ):
-    return [ c+1 if matrix.index(c) == 6 else c for c in matrix if matrix ]
-
-def remove_deputy( matrix ):
-    return [ c-1 if matrix.index(c) == 6 else c for c in matrix if matrix ]
-
-def add_blessing( vector ):
-    return ic( [ (v+1)*2 if i == 7 else v for i,v in enumerate(vector) ] )
-
-def remove_blessing( matrix):
-    return [ c-1 if matrix.index(c) == 7 else c for c in matrix if matrix ]
-
-def add_curse( matrix ):
-    return remove_blessing( matrix )
-
-def remove_curse( matrix ):
-    return add_blessing( matrix )
-
-# skills
-
-def inc_skill( matrix ):
-    return [ matrix[0], matrix[1]+1, matrix[2] ]
-
-def dec_skill( matrix ):
-    return [ matrix[0], matrix[1]-1, matrix[2] ]
-
-def inc_focus( matrix ):
-    return inc_skill( matrix )
-
-def dec_focus( matrix ):
-    return dec_skill( matrix )
-
-def inc_speed( matrix ):
-    return inc_skill( matrix )
-
-def dec_speed( matrix ):
-    return dec_skill( matrix )
-
-def inc_fight( matrix ):
-    return inc_skill( matrix )
-
-def dec_fight( matrix ):
-    return dec_skill( matrix )
-
-def inc_lore( matrix ):
-    return inc_skill( matrix )
-
-def dec_lore( matrix ):
-    return dec_skill( matrix )
-
-def inc_sneak( matrix ):
-    return dec_skill( matrix )
-
-def dec_sneak( matrix ):
-    return inc_skill( matrix )
-
-def inc_will( matrix ):
-    return dec_skill( matrix )
-
-def dec_will( matrix ):
-    return inc_skill( matrix )
-
-def inc_luck( matrix ):
-    return dec_skill( matrix )
-
-def dec_luck( matrix ):
-    return inc_skill( matrix )
-
-# locational
-
-def change_loc( matrix, new_loc ):
-    return [ new_loc, matrix[1], matrix[2] ]
-
-def move_to_CURIOSITIE_SHOPPE( matrix ):
-    return change_loc( matrix, 1 )
-
-def move_to_NEWSPAPER( matrix ):
-    return change_loc( matrix, 2 )
-
-def move_to_TRAIN_STATION( matrix ):
-    return change_loc( matrix, 3 )
-
-def move_to_NORTHSIDE_STREETS( matrix ):
-    return change_loc( matrix, 29 )
-
-def move_to_ARKHAM_ASYLUM( matrix ):
-    return change_loc( matrix, 4 )
-
-def move_to_BANK_OF_ARKHAM( matrix ):
-    return change_loc( matrix, 5 )
-
-def move_to_INDEPENDENCE_SQUARE( matrix ):
-    return change_loc( matrix, 6)
-
-def move_to_DOWNTOWN_STREETS( matrix ):
-    return change_loc( matrix, 30)
-
-def move_to_HIBBS_ROADHOUSE( matrix ):
-    return change_loc( matrix, 7 )
-
-def move_to_POLICE_STATION( matrix ):
-    return change_loc( matrix, 8 )
-
-def move_to_JAIL( matrix ):
-    return change_loc( matrix, 9)
-
-def move_to_VELMAS_DINER( matrix ):
-    return change_loc( matrix, 10)
-
-def move_to_DOWNTOWN_STREETS( matrix ):
-    return change_loc( matrix, 31)
-
-def move_to_RIVER_DOCKS( matrix ):
-    return change_loc( matrix, 11 )
-
-def move_to_THE_UNNAMEABLE( matrix ):
-    return change_loc( matrix, 12 )
-
-def move_to_UNVISITED_ISLE( matrix ):
-    return change_loc( matrix, 13)
-
-def move_to_MERCHANT_DISTRICT_STREETS( matrix ):
-    return change_loc( matrix, 32)
-
-def move_to_BLACK_CAVE( matrix ):
-    return change_loc( matrix, 14 )
-
-def move_to_GENERAL_STORE( matrix ):
-    return change_loc( matrix, 15 )
-
-def move_to_GRAVEYARD( matrix ):
-    return change_loc( matrix, 16)
-
-def move_to_RIVERTOWN_STREETS( matrix ):
-    return change_loc( matrix, 33)
-
-def move_to_ADMINISTRATION( matrix ):
-    return change_loc( matrix, 17 )
-
-def move_to_SCIENCE_BUILDING( matrix ):
-    return change_loc( matrix, 18 )
-
-def move_to_LIBRARY( matrix ):
-    return change_loc( matrix, 19)
-
-def move_to_MISKATONIC_UNIVERSITY_STREETS( matrix ):
-    return change_loc( matrix, 34)
-
-def move_to_THE_WITCH_HOUSE( matrix ):
-    return change_loc( matrix, 20 )
-
-def move_to_THE_SILVER_TWILIGHT_LODGE( matrix ):
-    return change_loc( matrix, 21 )
-
-def move_to_THE_INNER_SANCTUM( matrix ):
-    return change_loc( matrix, 22)
-
-def move_to_FRENCH_HILL_STREETS( matrix ):
-    return change_loc( matrix, 35)
-
-def move_to_ST_MARYS_HOSPITAL( matrix ):
-    return change_loc( matrix, 23 )
-
-def move_to_WOODS( matrix ):
-    return change_loc( matrix, 24 )
-
-def move_to_YE_OLDE_MAGICK_SHOPPE( matrix ):
-    return change_loc( matrix, 25)
-
-def move_to_UPTOWN_STREETS( matrix ):
-    return change_loc( matrix, 36)
-
-def move_to_MAS_BOARDING_HOUSE( matrix ):
-    return change_loc( matrix, 26 )
-
-def move_to_HISTORICAL_SOCIETY( matrix ):
-    return change_loc( matrix, 27 )
-
-def move_to_SOUTH_CHURCH( matrix ):
-    return change_loc( matrix, 28)
-
-def move_to_SOUTHSIDE_STREETS( matrix ):
-    return change_loc( matrix, 37)
-
-def inc_movement( matrix ):
-    return [ matrix[0], matrix[1]+1, matrix[2] ]
-
-def dec_movement( matrix ):
-    return [ matrix[0], matrix[1]-1, matrix[2] ]
-
-def set_in_arkham( matrix ):
-    return [ matrix[0], matrix[1], matrix[2]+1 ]
-
-def set_in_other_world( matrix ):
-    return [ matrix[0], matrix[1], matrix[2]-1 ]
-
-
-# equipment
-
-def inc_hands( matrix ):
-    return [ matrix[0]+1, matrix[1] ]
-
-def dec_hands( matrix ):
-    return [ matrix[0]-1, matrix[1] ]
-
-def equip_item( matrix, item ):
-    return [ matrix[0], matrix[1]+[item] ]
-
-def unequip( matrix, item ):
-    return [ matrix[0], matrix[1][:matrix[1].index(item)] + matrix[1][matrix[1].index(item)+1:] ]
-
-# exhausted items
-
-def exhaust_item( matrix, item ):
-    return matrix + [item]
-
-def refresh_items( matrix ):
-    return matrix[:0]
-
-
-# possessions
-
-def inc_money( dictionary ):
-    return { k:(v+1 if k == 'money' else v) for k,v in dictionary.items() }
-
-def dec_money( dictionary ):
-    return { k:(v-1 if k == 'money' else v) for k,v in dictionary.items() }
-
-def inc_clues( dictionary ):
-    return { k:(v+1 if k == 'clues' else v) for k,v in dictionary.items() }
-
-def dec_clues( dictionary ):
-    return { k:(v-1 if k == 'clues' else v) for k,v in dictionary.items() }
-
-def inc_gate_trophies( dictionary ):
-    return { k:(v+1 if k == 'gate_trophies' else v) for k,v in dictionary.items() }
-
-def dec_gate_trophies( dictionary ):
-    return { k:(v-1 if k == 'gate_trophies' else v) for k,v in dictionary.items() }
-
-def inc_monster_trophies( dictionary ):
-    return { k:(v+1 if k == 'monster_trophies' else v) for k,v in dictionary.items() }
-
-def dec_monster_trophies( dictionary ):
-    return { k:(v-1 if k == 'monster_trophies' else v) for k,v in dictionary.items() }
-
-def add_item( dictionary, variety, item ):
-    return { k:(v+[item] if k == variety else v) for k,v in dictionary.items() }
-
-def remove_item( dictionary, variety, item ):
-    return { k:( v[:v.index(item)] + v[v.index(item)+1:] if k == variety else v) for k,v in dictionary.items() }
-
-def add_weapon( dictionary, item ):
-    return add_item( dictionary, 'weapons', item )
-    
-def remove_weapon_item( dictionary, item ):
-    return remove_item( dictionary, 'weapons', item )
-
-def add_consumable_item( dictionary, item ):
-    return add_item( dictionary, 'consumables', item )
-
-def remove_consumable_item( dictionary, item ):
-    return remove_item( dictionary, 'consumables', item )
-
-def add_tome_item( dictionary, item ):
-    return add_item( dictionary, 'tomes', item )
-
-def remove_tome_item( dictionary, item ):
-    return remove_item( dictionary, 'tomes', item )
-
-def add_passive_buff( dictionary, item ):
-    return add_item( dictionary, 'passive_buffs', item )
-
-def remove_passive_buff( dictionary, item ):
-    return remove_item( dictionary, 'passive_buffs', item )
-
-def add_active_buff( dictionary, item ):
-    return add_item( dictionary, 'active_buffs', item )
-
-def remove_active_buff( dictionary, item ):
-    return remove_item( dictionary, 'active_buffs', item )
-
-def add_oddity_item( dictionary, item ):
-    return add_item( dictionary, 'oddities', item )
-
-def remove_oddity_item( dictionary, item ):
-    return remove_item( dictionary, 'oddities', item )
-
-def add_spell( dictionary, spell ):
-    return add_item( dictionary, 'spells', spell )
-
-def remove_spell( dictionary, spell ):
-    return remove_item( dictionary, 'spells', spell )
-
-def add_ally( dictionary, ally ):
-    return add_item( dictionary, 'allies', ally )
-
-def remove_ally( dictionary, ally ):
-    return remove_item( dictionary, 'allies', ally )
+def dec_current_skill( skill ):
+    db( 3 )
+    return decrease( skill, 'current_'+skill )
 
 # board
 
 def add_investigator( vector, investigator ):
-    return vector + [ investigator ]
+    return add_to_list( vector, investigator )
 
 def remove_investigator( vector, investigator ):
-    return vector[:vector.index(investigator)] + vector[vector.index(investigator)+1:] 
+    return remove_from_list( vector, investigator )
 
 def advance_current_phase( integer ):
-    return (integer + 1) % 4
+    return cycle_int( integer, 4 )
 
 def toggle_bookkeeping( integer ):
-    return (integer + 1) % 2
+    return cycle_int( integer, 2 )
 
 def set_ancient_one( vector, ancient_one ):
-    return vector + [ ancient_one ]
+    return add_to_list( vector, ancient_one )
+
+def set_awakened( awakened ):
+    return awakened + 1
 
 def inc_doom_track( integer ):
     return integer + 1
@@ -477,10 +80,10 @@ def inc_terror_track( integer ):
 def dec_terror_track( integer ):
     return integer - 1
 
-def inc_gates_open( integer ):
+def inc_gates_in_arkham( integer ):
     return integer + 1
 
-def dec_gates_open( integer ):
+def dec_gates_in_arkham( integer ):
     return integer - 1
 
 def inc_gates_sealed( integer ):
@@ -508,184 +111,672 @@ def dec_seals_to_win( vector ):
     return [ vector[0], vector[1] -1 ]
 
 def inc_monster_count( integer ):
-    """Decrements the monster limit in Arkham"""
-    return integer - 1
+    return integer + 1
 
 def dec_monster_count( integer ):
-    """Increments the monster limit in Arkham"""
-    return integer + 1
+    return integer - 1
 
 def remove_monster_limit( integer ):
     """Intended for removing the monster limit"""
-    return float('inf')
+    return float('-inf')
 
 def inc_outskirts_count( integer ):
-    """Decrements the outskirts limit"""
-    return integer - 1
+    return integer + 1
 
 def dec_outskirts_count( integer ):
-    """Increments the outskirts limit"""
-    return integer + 1
+    return integer - 1
 
 def add_monster_location( vector, dimension, location ):
     return [ locs + [location] if dim == dimension else locs for dim, locs in enumerate( vector ) ]
 
 def remove_monster_location( vector, dimension, location ):
-    return [ locs[:locs.index(location)] + locs[locs.index(location)+1:] if dim == dimension else locs for dim, locs in enumerate( vector ) ]
+    return [ locs[:locs.index(location)] + locs[locs.index(location)+1:] if dim == dimension else locs for dim, locs in enumerate( vector ) ] 
 
+# locations
 
-# weapons
+def add_occupant( location_occupants, new_occupant ):
+    db( 3 )
+    return add_to_list( location_occupants, new_occupant )
 
-def increase( vector, dimension ):
-    """ Increases a dimension in a vector by 1 """
-    return [ v+1 if i == dimension else v for i,v in enumerate(vector) ]
+def remove_occupant( location_occupants, old_occupant ):
+    db( 3 )
+    return remove_from_list( location_occupants, old_occupant )
 
-def decrease( vector, dimension ):
-    """ Decreases a dimension in a vector by 1 """
-    return [ v-1 if i == dimension else v for i,v in enumerate(vector) ]
+def add_gate_to( location_gate_to, new_gate ):
+    db( 3 )
+    return add_to_list( location_gate_to, new_gate )
 
-def cycle( vector, dimension, mod ):
-    """ Cycles a dimension in a vector from 0 through mod-1 """
-    return [ (v+1)%mod if i == dimension else v for i,v in enumerate(vector) ]
+def remove_gate_to( location_gate_to, old_gate ):
+    db( 3 )
+    return remove_from_list( location_gate_to, old_gate )
+    
+def inc_loc_clues( location ):
+    db( 3 )
+    return increase( location, 'clues' )
 
-def change_modality( vector ):
+def dec_loc_clues( location ):
+    db( 3 )
+    return decrease( location, 'clues' )
+
+def inc_historical_clues( location ):
+    db( 3 )
+    return increase( location, 'historical_clues' )
+
+def dec_historical_clues( location ):
+    db( 3 )
+    return decrease( location, 'historical_clues' )
+
+def add_seal( location ):
+    db( 3 )
+    return increase( location, 'sealed' )
+
+def remove_seal( location ):
+    db( 3 )
+    return decrease( location, 'sealed' )
+
+def add_gate( location ):
+    db( 3 )
+    return increase( location, 'gate' )
+
+def remove_gate( location ):
+    db( 3 )
+    return decrease( location, 'gate' )
+
+def inc_historical_gates( location ):
+    db( 3 )
+    return increase( location, 'historical_gates' )
+
+def dec_historical_gates( location ):
+    db( 3 )
+    return decrease( location, 'historical_gates' )
+
+def add_explored( location ):
+    db( 3 )
+    return increase( location, 'explored' )
+
+def remove_explored( location ):
+    db( 3 )
+    return decrease( location, 'explored' )
+
+def add_closed( location ):
+    db( 3 )
+    return increase( location, 'closed' ) 
+
+def remove_closed( location ):
+    db( 3 )
+    return decrease( location, 'closed' )
+
+# monsters
+
+def set_movement( rulesets, move_rules ):
+    db( 3 )
+    return rulesets._replace( movement=move_rules )
+
+def set_combat( rulesets, combat_rules ):
+    db( 3 )
+    return rulesets._replace( combat=combat_rules )
+
+def set_evade( rulesets, evade_rules ):
+    db( 3 )
+    return rulesets._replace( evade=evade_rules )
+
+def add_ambush( abilities ):
+    db( 3 )
+    return increase( abilities, 'ambush' )
+
+def remove_ambush( abilities ):
+    db( 3 )
+    return decrease( abilities, 'ambush' )
+
+def add_endless( abilities ):
+    db( 3 )
+    return increase( abilities, 'endless' )
+
+def remove_endless( abilities ):
+    db( 3 )
+    return decrease( abilities, 'endless' )
+
+def add_undead( abilities ):
+    db( 3 )
+    return increase( abilities, 'undead' )
+
+def remove_undead( abilities ):
+    db( 3 )
+    return decrease( abilities, 'undead' )
+
+def set_physical_immunity( abilities ):
+    db( 3 )
+    return abilities._replace( physical=0 )
+
+def set_physical_resistance( abilities ):
+    db( 3 )
+    return abilities._replace( physical=0.5 )
+
+def remove_physical( abilities ):
+    db( 3 )
+    return abilities._replace( physical=1 )
+
+def set_magical_immunity( abilities ):
+    db( 3 )
+    return abilities._replace( magical=0 )
+
+def set_magical_resistance( abilities ):
+    db( 3 )
+    return abilities._replace( magical=0.5 )
+
+def remove_magical( abilities ):
+    db( 3 )
+    return abilities._replace( magical=1 )
+
+def inc_nightmarish( abilities ):
+    db( 3 )
+    return increase( abilities, 'nightmarish' )
+
+def dec_nightmarish( abilities ):
+    db( 3 )
+    return decrease( abilities, 'nightmarish' )
+
+def inc_overwhelming( abilities ):
+    db( 3 )
+    return increase( abilities, 'overwhelming' )
+
+def dec_overwhelming( abilities ):
+    db( 3 )
+    return decrease( abilities, 'overwhelming' )
+
+def inc_awareness( stats ):
+    db( 3 )
+    return increase( stats, 'awareness' )
+
+def dec_awareness( stats ):
+    db( 3 )
+    return decrease( stats, 'awareness' )
+
+def inc_toughness( stats ):
+    db( 3 )
+    return increase( stats, 'toughness' )
+
+def dec_toughness( stats ):
+    db( 3 )
+    return decrease( stats, 'toughness' )
+
+def inc_horror_mod( stats ):
+    db( 3 )
+    return increase( stats, 'horror_mod' )
+
+def dec_horror_mod( stats ):
+    db( 3 )
+    return decrease( stats, 'horror_mod' )
+
+def inc_horror_received( stats ):
+    db( 3 )
+    return increase( stats, 'horror' )
+
+def dec_horror_received( stats ):
+    db( 3 )
+    return decrease( stats, 'horror' )
+
+def inc_combat_mod( stats ):
+    db( 3 )
+    return increase( stats, 'combat_mod' )
+
+def dec_combat_mod( stats ):
+    db( 3 )
+    return decrease( stats, 'combat_mod' )
+
+def inc_damage_received( stats ):
+    db( 3 )
+    return increase( stats, 'damage' )
+
+def dec_damage_received( stats ):
+    db( 3 )
+    return decrease( stats, 'damage' )
+
+# investigators
+
+def inc_max_damage( damage ):
+    db( 3 )
+    return increase( damage, 'max_damage' )
+
+def dec_max_damage( damage ):
+    db( 3 )
+    return decrease( damage, 'max_damage' )
+
+def inc_current_damage( damage ):
+    db( 3 )
+    return increase( damage, 'current_damage' )
+
+def dec_current_damage( damage ):
+    db( 3 )
+    return decrease( damage, 'current_damage' )
+
+def set_unconscious( damage ):
+    db( 3 )
+    return increase( damage, 'unconscious' )
+
+def set_conscious( damage ):
+    db( 3 )
+    return decrease( damage, 'unconscious' )
+
+def inc_max_horror( horror ):
+    db( 3 )
+    return increase( horror, 'max_horror' )
+
+def dec_max_horror( horror ):
+    db( 3 )
+    return decrease( horror, 'max_horror' )
+
+def inc_current_horror( horror ):
+    db( 3 )
+    return increase( horror, 'current_horror' )
+
+def dec_current_horror( horror ):
+    db( 3 )
+    return decrease( horror, 'current_horror' )
+
+def set_insane( horror ):
+    db( 3 )
+    return increase( horror, 'insane' )
+
+def set_sane( horror ):
+    db( 3 )
+    return decrease( horror, 'insane' )
+
+def add_lost_in_time_and_space( conditions ):
+    db( 3 )
+    return increase( conditions, 'lost_in_time_and_space' )
+
+def remove_lost_in_time_and_space( conditions ):
+    db( 3 )
+    return decrease( conditions, 'lost_in_time_and_space' )
+
+def add_delayed( conditions ):
+    db( 3 )
+    return increase( conditions, 'delayed' )
+
+def remove_delayed( conditions ):
+    db( 3 )
+    return decrease( conditions, 'delayed' )
+
+def add_arrested( conditions ):
+    db( 3 )
+    return increase( conditions, 'arrested' )
+
+def remove_arrested( conditions ):
+    db( 3 )
+    return decrease( conditions, 'arrested' )
+
+def add_retainer( conditions ):
+    db( 3 )
+    return increase( conditions, 'retainer' )
+
+def remove_retainer( conditions ):
+    db( 3 )
+    return decrease( conditions, 'retainer' )
+
+def add_bank_loan( conditions ):
+    db( 3 )
+    return increase( conditions, 'bank_loan' )
+
+def remove_bank_loan( conditions ):
+    db( 3 )
+    return decrease( conditions, 'bank_loan' )
+
+def set_bankrupt( conditions ):
+    db( 3 )
+    return conditions._replace( bank_loan=float('inf') )
+
+def add_stl_membership( conditions ):
+    db( 3 )
+    return increase( conditions, 'stl_membership' )
+
+def remove_stl_membership( conditions ):
+    db( 3 )
+    return decrease( conditions, 'stl_membership' )
+
+def add_deputized( conditions ):
+    db( 3 )
+    return increase( conditions, 'deputized' )
+
+def remove_deputized( conditions ):
+    db( 3 )
+    return decrease( conditions, 'deputized' )
+
+def add_blessing( conditions ):
+    db( 3 )
+    return increase( conditions, 'blessed_cursed' )
+
+def remove_blessing( conditions ):
+    db( 3 )
+    return decrease( conditions, 'blessed_cursed' )
+
+def add_curse( conditions ):
+    db( 3 )
+    return add_blessing( conditions )
+
+def remove_curse( conditions ):
+    db( 3 )
+    return remove_blessing( conditions )
+
+# skills
+
+def inc_max_focus( focus ):
+    db( 3 )
+    return increase( focus, 'max_focus' )
+
+def dec_max_focus( focus ):
+    db( 3 )
+    return decrease( focus, 'max_focus' )
+
+def inc_current_focus( focus ):
+    db( 3 )
+    return increase( focus, 'current_focus' )
+
+def dec_current_focus( focus ):
+    db( 3 )
+    return decrease( focus, 'current_focus' )
+
+def inc_max_speed( speed ):
+    db( 3 )
+    return increase( speed, 'max_speed' )
+
+def dec_max_speed( speed ):
+    db( 3 )
+    return decrease( speed, 'max_speed' )
+
+def inc_current_speed( speed ):
+    db( 3 )
+    return increase( speed, 'current_speed' )
+
+def dec_current_speed( speed ):
+    db( 3 )
+    return decrease( speed, 'current_speed' )
+
+def inc_current_sneak( speed ):
+    db( 3 )
+    return decrease( speed, 'current_speed' )
+
+def dec_current_sneak( speed ):
+    db( 3 )
+    return increase( speed, 'current_speed' )
+
+def inc_sum_speed_sneak( speed ):
+    db( 3 )
+    return increase( speed, 'speed_sneak_sum' )
+
+def dec_sum_speed_sneak( speed ):
+    db( 3 )
+    return decrease( speed, 'speed_sneak_sum' )
+
+def inc_max_fight( fight ):
+    db( 3 )
+    return increase( fight, 'max_fight' )
+
+def dec_max_fight( fight ):
+    db( 3 )
+    return decrease( fight, 'max_fight' )
+
+def inc_current_fight( fight ):
+    db( 3 )
+    return increase( fight, 'current_fight' )
+
+def dec_current_fight( fight ):
+    db( 3 )
+    return decrease( fight, 'current_fight' )
+
+def inc_current_will( fight ):
+    db( 3 )
+    return decrease( fight, 'current_fight' )
+
+def dec_current_will( fight ):
+    db( 3 )
+    return increase( fight, 'current_fight' )
+
+def inc_sum_fight_will( fight ):
+    db( 3 )
+    return increase( fight, 'fight_will_sum' )
+
+def dec_sum_fight_will( fight ):
+    db( 3 )
+    return decrease( fight, 'fight_will_sum' )
+
+def inc_max_lore( lore ):
+    db( 3 )
+    return increase( lore, 'max_lore' )
+
+def dec_max_lore( lore ):
+    db( 3 )
+    return decrease( lore, 'max_lore' )
+
+def inc_current_lore( lore ):
+    db( 3 )
+    return increase( lore, 'current_lore' )
+
+def dec_current_lore( lore ):
+    db( 3 )
+    return decrease( lore, 'current_lore' )
+
+def inc_current_luck( fight ):
+    db( 3 )
+    return decrease( fight, 'current_fight' )
+
+def dec_current_luck( fight ):
+    db( 3 )
+    return increase( fight, 'current_fight' )
+
+def inc_sum_lore_luck( lore ):
+    db( 3 )
+    return increase( lore, 'lore_luck_sum' )
+
+def dec_sum_lore_luck( lore ):
+    db( 3 )
+    return decrease( lore, 'lore_luck_sum' )
+
+def change_location( location, new_loc_id ):
+    db( 3 )
+    return location._replace( current_location=new_loc_id )
+
+def inc_mvmt_points( location ):
+    db( 3 )
+    return increase( location, 'mvmt_points' )
+
+def dec_mvmt_points( location ):
+    db( 3 )
+    return decrease( location, 'mvmt_points' )
+
+def add_in_arkham( location ):
+    db( 3 )
+    return increase( location, 'in_arkham' )
+
+def remove_in_arkham( location ):
+    db( 3 )
+    return decrease( location, 'in_arkham' )
+
+def inc_hands( equipped_items ):
+    db( 3 )
+    return increase( equipped_items, 'hands' )
+
+def dec_hands( equipped_items ):
+    db( 3 )
+    return decrease( equipped_items, 'hands' )
+
+def equip_item( equipped_items, item ):
+    db( 3 )
+    return equipped_items._replace( equipment = add_to_list( equipped_items, item ) )
+
+def dequip_item( equipped_items, item ):
+    db( 3 )
+    return equipped_items._replace( equipment = remove_from_list( equipped_items, item ) )
+
+def exhaust_item( exhausted_items, item ):
+    db( 3 )
+    return add_to_list( exhausted_items, item )
+
+def refresh_exhausted( exhausted_items ):
+    db( 3 )
+    return exhausted_items[:0] 
+
+# possessions
+
+def inc_money( possessions ):
+    db( 3 )
+    return { k:(v+1 if k == 'money' else v) for k,v in possessions.items() }
+
+def dec_money( possessions ):
+    db( 3 )
+    return { k:(v-1 if k == 'money' else v) for k,v in possessions.items() }
+
+def inc_inv_clues( possessions ):
+    db( 3 )
+    return { k:(v+1 if k == 'clues' else v) for k,v in possessions.items() }
+
+def dec_inv_clues( possessions ):
+    db( 3 )
+    return { k:(v-1 if k == 'clues' else v) for k,v in possessions.items() }
+
+def inc_gate_trophies( possessions ):
+    db( 3 )
+    return { k:(v+1 if k == 'gate_trophies' else v) for k,v in possessions.items() }
+
+def dec_gate_trophies( possessions ):
+    db( 3 )
+    return { k:(v-1 if k == 'gate_trophies' else v) for k,v in possessions.items() }
+
+def inc_monster_trophies( possessions ):
+    db( 3 )
+    return { k:(v+1 if k == 'monster_trophies' else v) for k,v in possessions.items() }
+
+def dec_monster_trophies( possessions ):
+    db( 3 )
+    return { k:(v-1 if k == 'monster_trophies' else v) for k,v in possessions.items() }
+
+def add_item( possessions, variety, item ):
+    db( 3 )
+    return { k:(v+[item] if k == variety else v) for k,v in possessions.items() }
+
+def remove_item( possessions, variety, item ):
+    db( 3 )
+    return { k:( v[:v.index(item)] + v[v.index(item)+1:] if k == variety else v) for k,v in possessions.items() }
+
+def add_weapon( possessions, item ):
+    db( 3 )
+    return add_item( possessions, 'weapons', item )
+    
+def remove_weapon_item( possessions, item ):
+    db( 3 )
+    return remove_item( possessions, 'weapons', item )
+
+def add_consumable_item( possessions, item ):
+    db( 3 )
+    return add_item( possessions, 'consumables', item )
+
+def remove_consumable_item( possessions, item ):
+    db( 3 )
+    return remove_item( possessions, 'consumables', item )
+
+def add_tome_item( possessions, item ):
+    db( 3 )
+    return add_item( possessions, 'tomes', item )
+
+def remove_tome_item( possessions, item ):
+    db( 3 )
+    return remove_item( possessions, 'tomes', item )
+
+def add_passive_buff( possessions, item ):
+    db( 3 )
+    return add_item( possessions, 'passive_buffs', item )
+
+def remove_passive_buff( possessions, item ):
+    db( 3 )
+    return remove_item( possessions, 'passive_buffs', item )
+
+def add_active_buff( possessions, item ):
+    db( 3 )
+    return add_item( possessions, 'active_buffs', item )
+
+def remove_active_buff( possessions, item ):
+    db( 3 )
+    return remove_item( possessions, 'active_buffs', item )
+
+def add_oddity_item( possessions, item ):
+    db( 3 )
+    return add_item( possessions, 'oddities', item )
+
+def remove_oddity_item( possessions, item ):
+    db( 3 )
+    return remove_item( possessions, 'oddities', item )
+
+def add_spell( possessions, spell ):
+    db( 3 )
+    return add_item( possessions, 'spells', spell )
+
+def remove_spell( possessions, spell ):
+    db( 3 )
+    return remove_item( possessions, 'spells', spell )
+
+def add_ally( possessions, ally ):
+    db( 3 )
+    return add_item( possessions, 'allies', ally )
+
+def remove_ally( possessions, ally ):
+    db( 3 )
+    return remove_item( possessions, 'allies', ally )
+
+# non-specific item transforms
+
+def inc_price( item ):
+    """ Increases the item price """
+    db( 3 )
+    return increase( item, 'price' )
+
+def dec_price( item ):
+    """ Decreases the item price """
+    db( 3 )
+    return decrease( item, 'price' )
+
+def inc_bonus( item ):
+    """ Increases item bonus """
+    db( 3 )
+    return increase( item, 'bonus' )
+
+def dec_bonus( item ):
+    """ Decreases item bonus """
+    db( 3 )
+    return decrease( item, 'bonus' )
+
+def inc_sanity_cost( item ):
+    """ Increases item sanity cost """
+    db( 3 )
+    return increase( item, 'sanity_cost' )
+
+def dec_sanity_cost( item ):
+    """ Decrease item sanity cost """
+    db( 3 )
+    return decrease( item, 'sanity_cost' )
+
+# weapons-specific transforms
+
+def change_modality( weapon ):
     """ Changes a physical weapon in a magical one, a magical into physical """
-    return cycle( vector, 0, 2 )
+    db( 3 )
+    return cycle( weapon, 'modality', 2 )
 
-def inc_bonus( vector ):
-    """ Increases weapon bonus """
-    return increase( vector, 1 )
+def change_exhaustable( weapon ):
+    """ Makes a non-exhaustible weapon exhaustable, exhaustible to non """
+    db( 3 )
+    return cycle( weapon, 'exhaustable', 2 )
 
-def dec_bonus( vector ):
-    """ Decreases weapon bonus """
-    return decrease( vector, 1 )
-
-def inc_san_cost( vector ):
-    """ Increases weapon sanity cost """
-    return increase( vector, 2 )
-
-def dec_san_cost( vector ):
-    """ Decrease weapon sanity cost """
-    return decrease( vector, 2 )
-
-def change_exhaust( vector ):
-    """ Makes a non-exhaustible weapon exhaustible, exhaustible to non """
-    return cycle( vector, 3, 2 )
-
-def change_losable( vector ):
+def change_losable( weapon ):
     """ Makes a non-losable weapon losable, losable to non """
-    return cycle( vector, 4 )
+    db( 3 )
+    return cycle( weapon, 'losable', 2 )
 
-def inc_price( vector ):
-    """ Increases the weapon price """
-    return increase( vector, 5 )
+# gates
 
-def dec_price( vector ):
-    return decrease( vector, 5 )
+def inc_gate_modifier( gate ):
+    db( 3 )
+    return increase( gate, 'modifier' )
 
-# transformers
-
-def set_movement_rules( rulset_vector, movement_rule ):
-    return [ movement_rule, rulset_vector[1], rulset_vector[2] ]
-
-def set_evade_rules( rulset_vector, evade_rule ):
-    return [ rulset_vector[0], evade_rule, rulset_vector[2] ]
-
-def set_combat_rules( rulset_vector, combat_rule ):
-    return [ rulset_vector[0], rulset_vector[1], combat_rule ]
-
-def add_ambush( abilities_vector ):
-    return [ a + 1 if i == 0 else a for i,a in enumerate( abilities_vector ) ]
-
-def remove_ambush( abilities_vector ):
-    return [ a - 1 if i == 0 else a for i,a in enumerate( abilities_vector ) ]
-
-def add_endless( abilities_vector ):
-    return [ a + 1 if i == 1 else a for i,a in enumerate( abilities_vector ) ]
-
-def remove_endless( abilities_vector ):
-    return [ a - 1 if i == 1 else a for i,a in enumerate( abilities_vector ) ]
-
-def add_undead( abilities_vector ):
-    return [ a + 1 if i == 2 else a for i,a in enumerate( abilities_vector ) ]
-
-def remove_undead( abilities_vector ):
-    return [ a - 1 if i == 2 else a for i,a in enumerate( abilities_vector ) ]
-
-def add_physical_resistance( abilities_vector ):
-    return [ a + 0.5 if i == 3 else a for i,a in enumerate( abilities_vector ) ]
-
-def remove_physical_resistance( abilities_vector ):
-    return [ a - 0.5 if i == 3 else a for i,a in enumerate( abilities_vector ) ]
-
-def add_physical_immunity( abilities_vector ):
-    return [ a + 1 if i == 3 else a for i,a in enumerate( abilities_vector ) ]
-
-def remove_physical_immunity( abilities_vector ):
-    return [ a - 1 if i == 3 else a for i,a in enumerate( abilities_vector ) ]
-
-def add_magical_resistance( abilities_vector ):
-    return [ a + 0.5 if i == 4 else a for i,a in enumerate( abilities_vector ) ]
-
-def remove_magical_resistance( abilities_vector ):
-    return [ a - 0.5 if i == 4 else a for i,a in enumerate( abilities_vector ) ]
-
-def add_magical_immunity( abilities_vector ):
-    return [ a + 1 if i == 4 else a for i,a in enumerate( abilities_vector ) ]
-
-def remove_magical_immunity( abilities_vector ):
-    return [ a - 1 if i == 4 else a for i,a in enumerate( abilities_vector ) ]
-
-def inc_nightmarish( abilities_vector ):
-    return [ a + 1 if i == 5 else a for i,a in enumerate( abilities_vector ) ]
-
-def dec_nightmarish( abilities_vector ):
-    return [ a - 1 if i == 5 else a for i,a in enumerate( abilities_vector ) ]
-
-def inc_overwhelming( abilities_vector ):
-    return [ a + 1 if i == 6 else a for i,a in enumerate( abilities_vector ) ]
-
-def dec_overwhelming( abilities_vector ):
-    return [ a - 1 if i == 6 else a for i,a in enumerate( abilities_vector ) ]
-
-def inc_awareness( stats_vector ):
-    return [ s - 1 if i == 0 else s for i,s in enumerate( stats_vector ) ]
-
-def dec_awareness( stats_vector ):
-    return [ s + 1 if i == 0 else s for i,s in enumerate( stats_vector ) ]
-
-def inc_toughness( stats_vector ):
-    return [ s + 1 if i == 1 else s for i,s in enumerate( stats_vector ) ]
-
-def dec_toughness( stats_vector ):
-    return [ s - 1 if i == 1 else s for i,s in enumerate( stats_vector ) ]
-
-def inc_horror_rating( stats_vector ):
-    return [ s - 1 if i == 2 else s for i,s in enumerate( stats_vector ) ]
-
-def dec_horror_rating( stats_vector ):
-    return [ s + 1 if i == 2 else s for i,s in enumerate( stats_vector ) ]
-
-def inc_horror_damage( stats_vector ):
-    return [ s - 1 if i == 3 else s for i,s in enumerate( stats_vector ) ]
-
-def dec_horror_damage( stats_vector ):
-    return [ s + 1 if i == 3 else s for i,s in enumerate( stats_vector ) ]
-
-def inc_combat_rating( stats_vector ):
-    return [ s - 1 if i == 4 else s for i,s in enumerate( stats_vector ) ]
-
-def dec_combat_rating( stats_vector ):
-    return [ s + 1 if i == 4 else s for i,s in enumerate( stats_vector ) ]
-
-def inc_combat_damage( stats_vector ):
-    return [ s - 1 if i == 5 else s for i,s in enumerate( stats_vector ) ]
-
-def dec_combat_damage( stats_vector ):
-    return [ s + 1 if i == 5 else s for i,s in enumerate( stats_vector ) ]
-
-def inc_freq( dictionary, monster ):
-    return { m:f+1 if m.upper() == monster.upper() else f for m,f in dictionary.items() }
-
-def dec_freq( dictionary, monster ):
-    return { m:f-1 if m.upper() == monster.upper() else f for m,f in dictionary.items() }
+def dec_gate_modifier( gate ):
+    db( 3 )
+    return decrease( gate, 'modifier' )
