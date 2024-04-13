@@ -38,3 +38,19 @@ UPTOWN STREETS,UPTOWN,STREET AREA,"ST. MARY'S HOSPITAL, YE OLDE MAGICK SHOPPE, W
 SOUTHSIDE STREETS,SOUTHSIDE,STREET AREA,"MA'S BOARDING HOUSE, SOUTH CHURCH, HISTORICAL SOCIETY, FRENCH HILL STREETS, UPTOWN STREETS",FRENCH HILL STREETS,UPTOWN STREETS,null,null,null,0,FALSE,null,FALSE,FALSE,null,null,null
 OUTSKIRTS,null,SPECIAL,null,null,null,null,null,null,null,null,null,null,null,null,null,null
 THE SKY,null,SPECIAL,"NORTHSIDE STREETS,DOWNTOWN STREETS,EASTTOWN STREETS,MERCHANT DISTRICT STREETS,RIVERTOWN STREETS,MISKATONIC UNIVERSITY STREETS,FRENCH HILL STREETS,UPTOWN STREETS,SOUTHSIDE STREETS",null,null,null,null,null,null,null,null,null,null,null,null,null
+R'LYEH,OTHER WORLD,OTHER WORLD,NIGHTMARE CORPSE-CITY,null,null,null,null,null,null,null,null,null,null,null,null,null
+NIGHTMARE CORPSE-CITY,OTHER WORLD,OTHER WORLD,null,null,null,null,null,null,null,null,null,null,null,null,null,null
+PLATEAU OF LENG,OTHER WORLD,OTHER WORLD,HIDEOUS TABLELANDS,null,null,null,null,null,null,null,null,null,null,null,null,null
+HIDEOUS TABLELANDS,OTHER WORLD,OTHER WORLD,null,null,null,null,null,null,null,null,null,null,null,null,null,null
+THE DREAMLANDS,OTHER WORLD,OTHER WORLD,CARTER'S QUEST,null,null,null,null,null,null,null,null,null,null,null,null,null
+CARTER'S QUEST,OTHER WORLD,OTHER WORLD,null,null,null,null,null,null,null,null,null,null,null,null,null,null
+THE GREAT HALL OF CELEANO,OTHER WORLD,OTHER WORLD,THE STOLEN LIBRARY,null,null,null,null,null,null,null,null,null,null,null,null,null
+THE STOLEN LIBRARY,OTHER WORLD,OTHER WORLD,null,null,null,null,null,null,null,null,null,null,null,null,null,null
+YUGGOTH,OTHER WORLD,OTHER WORLD,FUNGOID PLANET,null,null,null,null,null,null,null,null,null,null,null,null,null
+FUNGOID PLANET,OTHER WORLD,OTHER WORLD,null,null,null,null,null,null,null,null,null,null,null,null,null,null
+THE CITY OF THE GREAT RACE,OTHER WORLD,OTHER WORLD,PNAKOTUS,null,null,null,null,null,null,null,null,null,null,null,null,null
+PNAKOTUS,OTHER WORLD,OTHER WORLD,null,null,null,null,null,null,null,null,null,null,null,null,null,null
+THE ABYSS,OTHER WORLD,OTHER WORLD,HOME OF THE LIVING SHADOW,null,null,null,null,null,null,null,null,null,null,null,null,null
+HOME OF THE LIVING SHADOW,OTHER WORLD,OTHER WORLD,null,null,null,null,null,null,null,null,null,null,null,null,null,null
+ANOTHER DIMENSION,OTHER WORLD,OTHER WORLD,THE ALTERNATIVE WORLD,null,null,null,null,null,null,null,null,null,null,null,null,null
+THE ALTERNATIVE WORLD,OTHER WORLD,OTHER WORLD,null,null,null,null,null,null,null,null,null,null,null,null,null,null
