@@ -1,21 +1,23 @@
+from icecream import ic
+
 def __current_stat__( vector, transforms ):
     v = vector
     for transform in transforms:
-        v = transform[0]( v, transform[1]) if type( transform ) == tuple  else transform(v)
+        v = transform[0]( v, *transform[1:]) if type( transform ) == tuple  else transform(v)
     return v
 
 # board
 
-def board_investigators( investigators, transformations ):
+def boardInvestigators( investigators, transformations ):
     return __current_stat__( investigators, transformations )
 
-def board_current_player( current_player, transformations ):
+def boardCurrentPlayer( current_player: int, transformations: list ) -> int:
     return __current_stat__( current_player, transformations )
 
-def board_current_phase( current_phase, transformations ):
+def boardCurrentPhase( current_phase, transformations ):
     return __current_stat__( current_phase, transformations )
 
-def board_bookkeeping( bookkeeping, transformations ):
+def boardBookkeeping( bookkeeping, transformations ):
     return __current_stat__( bookkeeping, transformations )
 
 def board_ancient_one( ancient_one, transformations ):
@@ -30,7 +32,7 @@ def board_doom_track( doom_track, transformations ):
 def board_terror_track( terror_track, transformations ):
     return __current_stat__( terror_track, transformations )
 
-def board_gates_in_arkham( gates_in_arkham, transformations ):
+def boardGatesInArkham( gates_in_arkham, transformations ):
     return __current_stat__( gates_in_arkham, transformations )
 
 def board_gates_sealed( gates_sealed, transformations ):
@@ -39,7 +41,7 @@ def board_gates_sealed( gates_sealed, transformations ):
 def board_clues_to_seal( clues_to_seal, transformations ):
     return __current_stat__( clues_to_seal, transformations )
 
-def board_win_cond( win_cond, transformations ):
+def boardWinCond( win_cond, transformations ):
     return __current_stat__( win_cond, transformations )
 
 def board_monsters_in_arkham( monster_limit, transformations ):
@@ -51,9 +53,32 @@ def board_monsters_in_outskirts( outskirts_limit, transformations ):
 def board_monster_locations( monster_locations, transformations ):
     return __current_stat__( monster_locations, transformations )
 
+# mythos
+
+def mythosHeadline( headline, transformations ):
+    return __current_stat__( headline, transformations )
+
+def mythosMystic( mystic, transformations ):
+    return __current_stat__( mystic, transformations )
+
+def mythosUrban( urban, transformations ):
+    return __current_stat__( urban, transformations )
+
+def mythosWeather( weather, transformations ):
+    return __current_stat__( weather, transformations )
+
+def mythosModifiers( modifiers, transformations ):
+    return __current_stat__( modifiers, transformations )
+
+def mythosBannedMonster( bannedMonster, transformations ):
+    return __current_stat__( bannedMonster, transformations )
+
+def mythosResolution( resolution, transformations ):
+    return __current_stat__( resolution, transformations )
+
 # decks 
 
-def deck_frequency( deck, transformations ):
+def deckFrequency( deck, transformations ):
     return __current_stat__( deck, transformations )
 
 # locations 
@@ -67,8 +92,11 @@ def location_occupants( location, transformations):
 def location_gate_to( location, transformations ):
     return __current_stat__( location, transformations )
 
-def location_status( location, transformations ):
+def locationStatus( location, transformations ):
     return __current_stat__( location, transformations )
+
+def graph( graph, transformations ):
+    return __current_stat__( graph, transformations )
 
 # monsters
 
@@ -83,34 +111,34 @@ def monster_stats( stats, transformations ):
 
 # investigators
 
-def investigator_damage( damage, transformations ):
+def investigatorDamage( damage, transformations ):
     return __current_stat__( damage, transformations )
 
-def investigator_horror( horror, transformations ):
+def investigatorHorror( horror, transformations ):
     return __current_stat__( horror, transformations )
 
-def investigator_conditions( conditions, transformations ):
+def investigatorConditions( conditions, transformations ):
     return __current_stat__( conditions, transformations )
 
-def investigator_focus( focus, transformations ):
+def investigatorFocus( focus, transformations ):
     return __current_stat__( focus, transformations )
 
-def investigator_skill( skill, transformations ):
+def investigatorSkill( skill, transformations ):
     return __current_stat__( skill, transformations )
 
-def investigator_complement_skill( skill, transformations ):
-    return skill[2] - investigator_skill( skill, transformations )[1]
+def investigatorComplementSkill( skill, transformations ):
+    return skill[2] - investigatorSkill( skill, transformations )[1]
 
-def investigator_location( location, transformations ):
+def investigatorLocation( location, transformations ):
     return __current_stat__( location, transformations )
 
-def investigator_equipped_items( equipped_items, transformations ):
+def investigatorEquippedItems( equipped_items, transformations ):
     return __current_stat__( equipped_items, transformations )
 
-def investigator_exhausted_items( exhausted_items, transformations ):
+def investigatorExhaustedItems( exhausted_items, transformations ):
     return __current_stat__( exhausted_items, transformations )
 
-def investigator_possessions( possessions, transformations ):
+def investigatorPossessions( possessions, transformations ):
     return __current_stat__( possessions, transformations )
 
 # items
@@ -120,5 +148,5 @@ def item_stats( stats, transformations ):
 
 # gates
 
-def gate_freqs( gates_deck, transformations ):
+def gateFreqs( gates_deck, transformations ):
     return __current_stat__( gates_deck, transformations )
