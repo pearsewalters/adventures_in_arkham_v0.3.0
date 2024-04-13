@@ -1,6 +1,6 @@
 import currency
 
-def location_clues_constraint( matrix, next_transform, prev_transforms ):
+def cluesAtLocation( matrix, next_transform, prev_transforms ):
     """
         CLUES AT LOCATIONS
         There is no upper limit to the number of clues at a location, but it should 
@@ -15,7 +15,7 @@ def location_clues_constraint( matrix, next_transform, prev_transforms ):
                                0 if passed a bad transform,
                                1 if passed a good transform.
     """
-    transformed_matrix = next_transform( currency.location_status( matrix, prev_transforms) )
+    transformed_matrix = next_transform( currency.locationStatus( matrix, prev_transforms) )
     # can't be less than 0 or on a location with a gate or a seal
     if transformed_matrix[0] >= 0 and transformed_matrix[2] != 1 and transformed_matrix[3] != 1:
         return 1
@@ -26,21 +26,21 @@ def location_clues_constraint( matrix, next_transform, prev_transforms ):
     else:
         return 0
     
-def location_seal_constraint( matrix, next_transform, prev_transforms ):
+def sealAtLocation( matrix, next_transform, prev_transforms ):
     """
         SEALS ON LOCATIONS
         A gate cannot open on a sealed location. Sealed locations may become unsealed by 
             way of various game effects.
         This stat exists in {0,1} where 0 is unsealed and 1 is sealed.
     """
-    transformed_matrix = next_transform( currency.location_status( matrix, prev_transforms) )
+    transformed_matrix = next_transform( currency.locationStatus( matrix, prev_transforms) )
     # has to be 0 or 1
     if 0 <= transformed_matrix[2] <= 1:
         return True
     else:
         return False
     
-def location_gate_constraint( matrix, next_transform, prev_transforms ):
+def gateAtLocation( matrix, next_transform, prev_transforms ):
     """
         GATES ON LOCATIONS
         A gate on a location is a portal to one of the Other Worlds. A location cannot have 
@@ -52,7 +52,7 @@ def location_gate_constraint( matrix, next_transform, prev_transforms ):
                                                  1 is a good transform but no monster surge, and
                                                  2 is a good transform with a monster surge.
     """
-    transformed_matrix = next_transform( currency.location_status( matrix, prev_transforms) )
+    transformed_matrix = next_transform( currency.locationStatus( matrix, prev_transforms) )
     if transformed_matrix[3] < 0:
         return 0
     elif 0 <= transformed_matrix[3] <= 1:
@@ -60,7 +60,7 @@ def location_gate_constraint( matrix, next_transform, prev_transforms ):
     elif 1 < transformed_matrix[3]:
         return 2
 
-def location_explored_constraint( matrix, next_transform, prev_transforms ):
+def exploredLocation( matrix, next_transform, prev_transforms ):
     """
         EXPLORED GATE AT LOCATION
         If a location is marked as having been explored, any investigator who is at that location
@@ -70,14 +70,14 @@ def location_explored_constraint( matrix, next_transform, prev_transforms ):
             World. 
         This stat exists in {0,1} where 0 is not explored, and 1 is explored.
     """
-    transformed_matrix = next_transform( currency.location_status( matrix, prev_transforms) )
+    transformed_matrix = next_transform( currency.locationStatus( matrix, prev_transforms) )
     # has to be 0 or 1
     if 0 <= transformed_matrix[4] <= 1:
         return True
     else:
         return False
     
-def location_closed_constraint( matrix, next_transform, prev_transforms ):
+def openCloseLocation( matrix, next_transform, prev_transforms ):
     """
         CLOSED LOCATIONS
         Locations can close for a number of reasons, but commonly because of Terror Track effects.
@@ -85,16 +85,17 @@ def location_closed_constraint( matrix, next_transform, prev_transforms ):
             be a Sneak[-1] check. With 1 success they will gain one of the two resources that 
             location has to offer. With 2 successes they will gain both resources the location offers.
             With 0 successes, a Luck[-1] check will occur; on a failure, the Investigator is ARRESTED.
-        This stat exists in {0,1} with 0 being open for business, and 1 being closed.
+        This stat exists in {0,1,∞} with 0 being open for business, 1 being closed, and ∞ being permanently
+        closed.
     """
-    transformed_matrix = next_transform( currency.location_status( matrix, prev_transforms) )
+    condition = next_transform( currency.locationStatus( matrix, prev_transforms) ).closed
     # has to be 0 or 1
-    if 0 <= transformed_matrix[5] <= 1:
+    if condition in { 0, 1, float('inf') }:
         return True
     else:
         return False
     
-def damage_constraint( matrix, next_transform, prev_transforms ):
+def investigatorDamage( matrix, next_transform, prev_transforms ):
     """
         DAMAGE:
         A Character who receives greater than or equal to their max_damage becomes unconscious. 
@@ -104,7 +105,7 @@ def damage_constraint( matrix, next_transform, prev_transforms ):
                                1 if the Character's damage is on the interval [0, max), or
                                2 if the Character's damage is on the interval [max, inf) 
     """
-    transformed_matrix = next_transform( currency.investigator_damage( matrix, prev_transforms ) )
+    transformed_matrix = next_transform( currency.investigatorDamage( matrix, prev_transforms ) )
     # damage can't less than 0 or greater than max
     if 0 <= transformed_matrix[1] <= transformed_matrix[0]:
         return 1
@@ -115,7 +116,7 @@ def damage_constraint( matrix, next_transform, prev_transforms ):
     else:
         return 0
     
-def horror_constraint( matrix, next_transform, prev_transforms ):
+def investigatorHorror( matrix, next_transform, prev_transforms ):
     """
         HORROR:
         A Character who receives greater than or equal to their max_horror becomes insane. 
@@ -125,85 +126,87 @@ def horror_constraint( matrix, next_transform, prev_transforms ):
                                1 if the Character's horror is on the interval [0, max), or
                                2 if the Character's horror is on the interval [max, inf) 
     """
-    return damage_constraint( matrix, next_transform, prev_transforms )
+    return investigatorDamage( matrix, next_transform, prev_transforms )
 
-def unconscious_constraint( matrix, next_transform, prev_transforms ):
+def investigatorUnconscious( matrix, next_transform, prev_transforms ):
     """
         UNCONCIOUS:
         A Character becomes unconscious if they receive total damage of at least their max damage.
         This stat exists in {0,1}, where 0 is conscious and 1 is unconscious.
     """
-    transformed_matrix = next_transform( currency.investigator_horror( matrix, prev_transforms ) )
+    transformed_matrix = next_transform( currency.investigatorDamage( matrix, prev_transforms ) )
     # unconscious can only be 0 or 1 
     if 0 <= transformed_matrix[1] <= 1:
         return True
     else:
         return False
     
-def insane_constraint( matrix, next_transform, prev_transforms ):
+def investigatorInsane( matrix, next_transform, prev_transforms ):
     """
         INSANE:
         A Character becomes insane if they receive total horror of at least their max horror.
         This stat exists in {0,1}, where 0 is sane and 1 is insane.
     """
-    return unconscious_constraint( matrix, next_transform, prev_transforms )
+    return investigatorUnconscious( matrix, next_transform, prev_transforms )
 
-def delay_constraint( matrix, next_transform, prev_transforms ):
+def investigatorDelay( matrix, next_transform, prev_transforms ):
     """
         DELAYED
         A Character becomes delayed for a number of reasons. If delayed, a Character cannot take their turn until they 
             become undelayed during the following Upkeep phase.
         This stat exists in {0,1} where 0 is undelayed, and 1 is delayed.
     """
-    transformed_matrix = next_transform( currency.investigator_conditions( matrix, prev_transforms) )
+    transformed_matrix = next_transform( currency.investigatorConditions( matrix, prev_transforms) )
     # this value has to be 0 or 1
     if 0 <= transformed_matrix[0] <= 1:
         return True
     else:
         return False
     
-def arrest_constraint( matrix, next_transform, prev_transforms ):
+def investigatorArrested( matrix, next_transform, prev_transforms ):
     """
         ARRESTED
         A Character can be arrested because of certain in-game events. If arrested, a Character becomes DELAYED.
-        This stat exists in {0,1} where 0 is un-arrested, and 1 is arrested.
+        This stat exists in {0,1,∞} where 0 is un-arrested, and 1 is arrested. Additionally, there are game effects
+        that will make a character "unarrestable." In this case, the stat is set to infinity, (which causes any 
+        attempt to arrest the investigator to fail) 
     """
-    transformed_matrix = next_transform( currency.investigator_conditions( matrix, prev_transforms) )
+    transformed_matrix = next_transform( currency.investigatorConditions( matrix, prev_transforms) )
     # this value has to be 0 or 1
     if 0 <= transformed_matrix[1] <= 1:
         return True
     else:
         return False
     
-def lost_constraints( matrix, next_transform, prev_transforms ):
+def investigatorLostInTimeAndSpace( matrix, next_transform, prev_transforms ):
     """
         LOST IN TIME & SPACE
         A Character becomes lost in time & space for a number of reasons. If lost in time & space, a Character becomes DELAYED.
         A Character remains lost in time & space after becoming undelayed until the following Upkeep phase.
         This stat exists in {0,1} where 0 is not lost in time & space, and 1 is lost in time & space.
     """
-    transformed_matrix = next_transform( currency.investigator_conditions( matrix, prev_transforms) )
+    transformed_matrix = next_transform( currency.investigatorConditions( matrix, prev_transforms) )
     # this value has to be 0 or 1
     if 0 <= transformed_matrix[2] <= 1:
         return True
     else:
         return False
     
-def retainer_constraints( matrix, next_transform, prev_transforms ):
+def investigatorRetainer( matrix, next_transform, prev_transforms ):
     """
         RETAINER
         A Character gains a retainer likely from the Newspaper. If a Character has a retainer, they gain $1 every Upkeep.
         After gaining their dollar, there is a chance the Character loses their retainer.
         This stat exists in {0,1} where 0 is 'has no retainer', and 1 is 'has retainer'.
     """
-    transformed_matrix = next_transform( currency.investigator_conditions( matrix, prev_transforms) )
+    transformed_matrix = next_transform( currency.investigatorConditions( matrix, prev_transforms) )
     # this value has to be 0 or 1
     if 0 <= transformed_matrix[3] <= 1:
         return True
     else:
         return False
     
-def bank_loan_constraints( matrix, next_transform, prev_transforms ):
+def investigatorBankLoan( matrix, next_transform, prev_transforms ):
     """
         BANK LOAN
         A Character gains a loan from the Bank of Arkham. When a Character gets the loan, 
@@ -215,7 +218,7 @@ def bank_loan_constraints( matrix, next_transform, prev_transforms ):
         This constraint check returns 0 if passed a bad transform, 1 if a good transform, and
         2 if a transform on a loan that can't be given.
     """
-    transformed_matrix = next_transform( currency.investigator_conditions( matrix, prev_transforms) )
+    transformed_matrix = next_transform( currency.investigatorConditions( matrix, prev_transforms) )
     # this value has to be 0, 1, or inf
     if 0 <= transformed_matrix[4] <= 1:
         return 1
@@ -224,61 +227,58 @@ def bank_loan_constraints( matrix, next_transform, prev_transforms ):
     else:
         return 0
     
-def twilight_constraints( matrix, next_transform, prev_transforms ):
+def investigatorSTLMembership( matrix, next_transform, prev_transforms ):
     """
         SILVER TWILIGHT LODGE MEMBERSHIP
         A Character gains a lodge membership from the Silver Twilight Lodge. If a Character has 
         a lodge membership, they can optionally have an encounter in the Inner Sanctum.
         This stat exists in {0,1} where 0 is 'has no lodge membership', and 1 is 'has lodge membership'.
     """
-    transformed_matrix = next_transform( currency.investigator_conditions( matrix, prev_transforms) )
+    transformed_matrix = next_transform( currency.investigatorConditions( matrix, prev_transforms) )
     # this value has to be 0 or 1
     if 0 <= transformed_matrix[5] <= 1:
         return True
     else:
         return False
 
-def deputy_constraints( matrix, next_transform, prev_transforms ):
+def investigatorDeputy( matrix, next_transform, prev_transforms ):
     """
         DEPUTY OF ARKHAM
         A Character is deputized for certain heroic acts. If a Character is a deputy, they 
         immediately gain a Patrol Wagon and a Deputy's Revolver, and they gain $1 every Upkeep.
         This stat exists in {0,1} where 0 is 'not deputized', and 1 is 'deputized'.
     """
-    transformed_matrix = next_transform( currency.investigator_conditions( matrix, prev_transforms) )
+    transformed_matrix = next_transform( currency.investigatorConditions( matrix, prev_transforms) )
     # this value has to be 0 or 1
     if 0 <= transformed_matrix[6] <= 1:
         return True
     else:
         return False
     
-def blessed_cursed_constraints( matrix, next_transform, prev_transforms ):
+def investigatorBlessedCursed( matrix, next_transform, prev_transforms ):
     """
         BLESSED & CURSED
         A Character can receive a blessing or a curse for a number of reasons. This status affects the outcome of skill checks.
         If a Character is cursed and becomes blessed, their condition is now normal (the effects cancel). Similarly, if a Character
             is blessed and becomes cursed, their condition is normal.
-        This stat exists in {-1,0,1} where -1 is cursed, 0 is normal, and 1 is blessed.
-        This constraint check returns 0 if given a bad transform, 1 if cursed, 2 if normal, and 3 if blessed.
+        This stat exists in {-2,-1,0,1,2} where -2 is cursed (first turn) -1 is cursed, 0 is normal, 1 is blessed, and 2 is blessed (first turn).
     """
-    transformed_matrix = next_transform( currency.investigator_conditions( matrix, prev_transforms) )
-    if not -1 <= transformed_matrix[7] <= 1:
-        return 0 # invalid transform
-    elif transformed_matrix[7] == -1:
-        return 1 # cursed
-    elif transformed_matrix[7] == 0:
-        return 2 # normal
-    elif transformed_matrix[7] == 1:
-        return 3 # blessed
+    transformed_matrix = next_transform( currency.investigatorConditions( matrix, prev_transforms) )
+
+    if transformed_matrix.blessedCursed in { -1, 0, 1 }:
+        return 1
+    if transformed_matrix.blessedCursed in { -2, 2 }:
+        return 2
+    return 0
     
-def skills_constraint( matrix, next_transform, prev_transforms ):
+def investigatorSkills( matrix, next_transform, prev_transforms ):
     """
         SKILLS
         Skills adjustments are bound by the maximum of that skill. The minimum is
         always 3 less than the max, hence the boundary.
         Use this to constrain the complement skill, as well.
     """
-    transformed_matrix = next_transform( currency.investigator_skill( matrix, prev_transforms) )
+    transformed_matrix = next_transform( currency.investigatorSkill( matrix, prev_transforms) )
     # skill must be inside the range defined on the investigator sheets
     if transformed_matrix[0] - 3 <= transformed_matrix[1] <= transformed_matrix[0]:
         return True
@@ -286,32 +286,32 @@ def skills_constraint( matrix, next_transform, prev_transforms ):
         return False
 
 
-def focus_constraint( matrix, next_transform, prev_transforms ):
+def investigatorFocus( matrix, next_transform, prev_transforms ):
     """
         FOCUS
         Focus is adjusted along with skills. Focus can't be less than 0 or more than 
             the maximum for that player.
     """
-    transformed_matrix = next_transform( currency.investigator_focus( matrix, prev_transforms) )
+    transformed_matrix = next_transform( currency.investigatorFocus( matrix, prev_transforms) )
     # focus can't be less than 0 or greater than the max
     if 0 <= transformed_matrix[1] <= transformed_matrix[0]:
         return True
     else:
         return False
 
-def change_loc_constraint( matrix, next_transform, prev_transforms, adjacency_matrix ):
+def investigatorChangeLoc( matrix, next_transform, prev_transforms, adjacency_matrix ):
     """
         CHANGING LOCATION
         Movement is a matter of substituting the current location for a desired location.
         This validator requires an adjacency matrix in order to behave normally.
         It will return true if the locations are adjacent, false if not.
     """
-    most_recent_location = currency.investigator_location( matrix, prev_transforms )[0]
-    transformed_location = next_transform( currency.investigator_location( matrix, prev_transforms ) )[0]
+    most_recent_location = currency.investigatorLocation( matrix, prev_transforms )[0]
+    transformed_location = next_transform( currency.investigatorLocation( matrix, prev_transforms ) )[0]
     # look at the adjaceny matrix to see if the moves are adjacent
     return bool( adjacency_matrix[most_recent_location][transformed_location] )
 
-def movement_pts_constraint( matrix, next_transform, prev_transforms ):
+def investigatorMvmtPoints( matrix, next_transform, prev_transforms ):
     """
         MOVEMENT POINTS
         Movement points are spent moving around the map of Arkham (not the Other Worlds).
@@ -320,27 +320,27 @@ def movement_pts_constraint( matrix, next_transform, prev_transforms ):
             buffs and allies.
         Movement points cannot be adjusted below 0.
     """
-    transformed_matrix = next_transform( currency.investigator_location( matrix, prev_transforms ) )
+    transformed_matrix = next_transform( currency.investigatorLocation( matrix, prev_transforms ) )
     # can't be less than zero
     if transformed_matrix[1] < 0:
         return False
     else:
         return True
 
-def in_arkham_constraint( matrix, next_transform, prev_transforms ):
+def investigatorInArkham( matrix, next_transform, prev_transforms ):
     """
         IN ARKHAM
         Certain game effects will only apply to Characters in Arkham (not in Other Worlds).
         This stat exists in {0,1}, where 0 is 'in Other Worlds,' and 1 is 'in Arkham.'
     """
-    transformed_matrix = next_transform( currency.investigator_location( matrix, prev_transforms ) )
+    transformed_matrix = next_transform( currency.investigatorLocation( matrix, prev_transforms ) )
     # can't be less than zero
     if 0 <= transformed_matrix[1] <= 1:
         return True
     else:
         return False
     
-def hands_constraint( matrix, next_transform, prev_transforms ):
+def investigatorHands( matrix, next_transform, prev_transforms ):
     """
         HANDS
         Investigators have a standard 2 hands available. Reducing this to less than 0 is illegal.
@@ -348,14 +348,14 @@ def hands_constraint( matrix, next_transform, prev_transforms ):
 
         Returns True if the proposed transform is 0 <= hands, else returns False
     """
-    transformed_matrix = next_transform( currency.investigator_equipped_items( matrix, prev_transforms ) )
+    transformed_matrix = next_transform( currency.investigatorEquippedItems( matrix, prev_transforms ) )
     # can't be less than 0
     if 0 <= transformed_matrix[0]:
         return True
     else:
         return False
     
-def money_constraint( dictionary, next_transform, prev_transforms ):
+def investigatorMoney( dictionary, next_transform, prev_transforms ):
     """
         MONEY
         Money exists in [0,inf). While the analog game has a finite amount of money tokens, 
@@ -363,39 +363,39 @@ def money_constraint( dictionary, next_transform, prev_transforms ):
             Since this is the case, I am assuming there's no reason to believe the money should 
             run out for any reason.
     """
-    transformed_dictionary = next_transform( currency.investigator_possessions( dictionary, prev_transforms ) )
+    transformed_dictionary = next_transform( currency.investigatorPossessions( dictionary, prev_transforms ) )
     # can't be less than 0
     if 0 <= transformed_dictionary['money']:
         return True
     else:
         return False
 
-def clues_constraint( dictionary, next_transform, prev_transforms ):
+def investigatorClues( dictionary, next_transform, prev_transforms ):
     """
         CLUES
         Clues exists in [0,inf), and so 'negative clues' is illegal. The analog game may have something to 
             say about running out of clue tokens, but I'm choosing to treat clue tokens as an infinite resource.
     """
-    transformed_dictionary = next_transform( currency.investigator_possessions( dictionary, prev_transforms ) )
+    transformed_dictionary = next_transform( currency.investigatorPossessions( dictionary, prev_transforms ) )
     # can't be less than 0
     if 0 <= transformed_dictionary['clues']:
         return True
     else:
         return False
     
-def gate_trophy_constraint( dictionary, next_transform, prev_transforms ):
+def investigatorGateTrophies( dictionary, next_transform, prev_transforms ):
     """
         GATE TROPHIES
         Gate trophies exist in [0,num_gates] where num_gates is the number of gate tokens in the game.
         Base game includes 16 gate tokens. Rewrite this constraint when including expansions.
     """
-    transformed_dictionary = next_transform( currency.investigator_possessions( dictionary, prev_transforms ) )
+    transformed_dictionary = next_transform( currency.investigatorPossessions( dictionary, prev_transforms ) )
     if 0 <= transformed_dictionary['gate_trophies'] <= 16:
         return True
     else:
         return False
     
-def monster_trophy_constraint( dictionary, next_transform, prev_transforms ):
+def investigatorMonsterTrophies( dictionary, next_transform, prev_transforms ):
     """
         MONSTER TROPHIES
         Monster trophies exist in [0,num_monsters] where num_monsters is the number of monster tokens in the game.
@@ -403,13 +403,13 @@ def monster_trophy_constraint( dictionary, next_transform, prev_transforms ):
         Rewrite this constraint whenever additional monsters are added, such as Nyarlathotep's masks or including 
             expansions.
     """
-    transformed_dictionary = next_transform( currency.investigator_possessions( dictionary, prev_transforms ) )
+    transformed_dictionary = next_transform( currency.investigatorPossessions( dictionary, prev_transforms ) )
     if 0 <= transformed_dictionary['monster_trophies'] <= 55:
         return True
     else:
         return False
     
-def too_many_gates_constraint( integer, next_transform, prev_transforms ):
+def boardGateLimit( integer, next_transform, prev_transforms ):
     """
         TOO MANY GATES
         There is a limit to the number of gates that can be open at once.
@@ -418,14 +418,14 @@ def too_many_gates_constraint( integer, next_transform, prev_transforms ):
         This function returns -1 if passed a bad transform, 0 if passed a good transform,
         or 1 if passed a transform that surpasses the gate limit.
     """
-    transformed_integer = next_transform( currency.board_gates_in_arkham( integer, prev_transforms ) )
+    transformed_integer = next_transform( currency.boardGatesInArkham( integer, prev_transforms ) )
     if transformed_integer <= 0:
         return 0
     elif 0 < transformed_integer:
         return 1
     return -1
 
-def too_many_monsters_constraint( integer, next_transform, prev_transforms ):
+def boardMonstersInArkhamLimit( integer, next_transform, prev_transforms ):
     """
         TOO MANY MONSTERS
         The monster limit is set at the beginning of the game at according to how
@@ -443,7 +443,7 @@ def too_many_monsters_constraint( integer, next_transform, prev_transforms ):
         return 2
     return 0
     
-def outskirts_full_constraint( integer, next_transform, prev_transforms ):
+def boardMonstersInOutskirtsLimit( integer, next_transform, prev_transforms ):
     """
         OUTSKIRTS ARE FULL
         When there are too many monsters in the outskirts, the terror level increases. 
@@ -459,7 +459,7 @@ def outskirts_full_constraint( integer, next_transform, prev_transforms ):
         return 2
     return 0
     
-def terror_track_constraint( integer, next_transfrom, prev_transforms ):
+def boardTerrorTrack( integer, next_transfrom, prev_transforms ):
     """
         TERROR TRACK
         As the terror track increases, various business close down and allies leave town.
@@ -483,7 +483,7 @@ def terror_track_constraint( integer, next_transfrom, prev_transforms ):
         return 1
     return 0
 
-def doom_track_constraint( integer, next_transform, prev_transforms ):
+def boardDoomTrack( integer, next_transform, prev_transforms ):
     """
         DOOM TRACK
         Every time a gate appears, the Doom Track increases by one. Additionally,
@@ -502,9 +502,7 @@ def doom_track_constraint( integer, next_transform, prev_transforms ):
     elif 0 <= transformed_integer:
         return 1
     
-
-
-def movement_rules_constraint( vector, next_transform, prev_transforms ):
+def monsterMvmtRules( vector, next_transform, prev_transforms ):
     """
         MONSTER MOVEMENT RULESETS
         Monsters will move when the Mythos procedure calls for it. "Movement" looks different
@@ -536,7 +534,7 @@ def movement_rules_constraint( vector, next_transform, prev_transforms ):
     else:
         return True
     
-def evade_rules_constraint( vector, next_transform, prev_transforms ):
+def monsterEvadeRules( vector, next_transform, prev_transforms ):
     """
         MONSTER EVASION RULESETS
         When an Investigator performs an Evade check against monster, the monster's evade ruleset
@@ -562,7 +560,7 @@ def evade_rules_constraint( vector, next_transform, prev_transforms ):
     else:
         return True
 
-def combat_rules_constraint( vector, next_transform, prev_transforms ):
+def monsterCombatRules( vector, next_transform, prev_transforms ):
     """
         MONSTER COMBAT RULESETS
         When an Investigator performs a Combat check against a monster, the monster's combat
@@ -614,7 +612,7 @@ def combat_rules_constraint( vector, next_transform, prev_transforms ):
     else:
         return True
     
-def ambush_constraint( vector, next_transform, prev_transforms ):
+def monsterAmbush( vector, next_transform, prev_transforms ):
     """
         AMBUSH
 
@@ -625,7 +623,7 @@ def ambush_constraint( vector, next_transform, prev_transforms ):
     else:
         return False
     
-def endless_constraint( vector, next_transform, prev_transforms ):
+def monsterEndless( vector, next_transform, prev_transforms ):
     """
         ENDLESS
 
@@ -636,7 +634,7 @@ def endless_constraint( vector, next_transform, prev_transforms ):
     else:
         return False
     
-def undead_constraint( vector, next_transform, prev_transforms ):
+def monsterUndead( vector, next_transform, prev_transforms ):
     """
         UNDEAD
 
@@ -647,7 +645,7 @@ def undead_constraint( vector, next_transform, prev_transforms ):
     else:
         return False
     
-def phsyical_constraint( vector, next_transform, prev_transforms ):
+def monsterPhysical( vector, next_transform, prev_transforms ):
     """
         PHYSICAL RESISTANCE AND IMMUNITY
 
@@ -658,7 +656,7 @@ def phsyical_constraint( vector, next_transform, prev_transforms ):
     else:
         return False
     
-def magical_constraint( vector, next_transform, prev_transforms ):
+def monsterMagical( vector, next_transform, prev_transforms ):
     """
         MAGICAL RESISTANCE AND IMMUNITY
 
@@ -669,7 +667,7 @@ def magical_constraint( vector, next_transform, prev_transforms ):
     else:
         return False
     
-def nightmarish_constraint( vector, next_transform, prev_transforms ):
+def monsterNightmarish( vector, next_transform, prev_transforms ):
     """
         NIGHTMARISH
 
@@ -680,7 +678,7 @@ def nightmarish_constraint( vector, next_transform, prev_transforms ):
     else:
         return False
     
-def overwhelming_constraint( vector, next_transform, prev_transforms ):
+def monsterOverwhelming( vector, next_transform, prev_transforms ):
     """
         OVERWHELMING
 
@@ -691,7 +689,7 @@ def overwhelming_constraint( vector, next_transform, prev_transforms ):
     else:
         return False
 
-def toughness_constraint( vector, next_transform, prev_transforms ):
+def monsterToughness( vector, next_transform, prev_transforms ):
     """
         TOUGHNESS
 
