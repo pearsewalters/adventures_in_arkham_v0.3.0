@@ -1,6 +1,7 @@
 from icecream import ic
 from params import DEBUG_LVL
 from tools import debugger as db
+from classes.table import Table
 
 
 # generalizable functions
@@ -12,7 +13,7 @@ def decrease( vector, dimension ):
     """ Decreases a dimension in a vector by 1 """
     return vector._replace(**{ dimension: getattr(vector,dimension) - 1} )
 
-def cycle_int( integer, mod ):
+def cycleInt( integer, mod ):
     """ Cycles an integer up, 0 thru mod-1 """
     return (integer + 1) % mod
 
@@ -20,763 +21,829 @@ def cycle( vector, dimension, mod ):
     """ Cycles a dimension in a vector from 0 through mod-1 """
     return vector._replace( **{ dimension : (getattr( vector, dimension) + 1) % mod } )
 
-def add_to_list( l, element ):
+def addToList( l, element ):
     return l + [ element ]
 
-def remove_from_list( l, element ):
+def removeFromList( l, element ):
     return l[ :l.index(element) ] + l[ l.index(element)+1: ]
 
-def inc_freq( dictionary, key ):
-    return { m:f+1 if m.upper() == key.upper() else f for m,f in dictionary.items() }
+def incFreq( dictionary, key ):
+    return { m:f+1 if m == key else f for m,f in dictionary.items() }
 
-def dec_freq( dictionary, key ):
-    return { m:f-1 if m.upper() == key.upper() else f for m,f in dictionary.items() }
+def decFreq( dictionary, key ):
+    return { m:f-1 if m == key else f for m,f in dictionary.items() }
 
-def inc_max_skill( skill ):
+def incMaxSkill( skill ):
     db( 3 )
-    return increase( skill, 'max_'+skill )
+    return increase( skill, 'max'+skill.capitalize() )
 
-def dec_max_skill( skill ):
+def decMaxSkill( skill ):
     db( 3 )
-    return decrease( skill, 'max_'+skill )
+    return decrease( skill, 'max'+skill.capitalize() )
 
-def inc_current_skill( skill ):
+def incCurrentSkill( skill ):
     db( 3 )
-    return increase( skill, 'current_'+skill )
+    return increase( skill, 'current'+skill.capitalize() )
 
-def dec_current_skill( skill ):
+def decCurrentSkill( skill ):
     db( 3 )
-    return decrease( skill, 'current_'+skill )
+    return decrease( skill, 'current'+skill.capitalize() )
 
 # board
 
-def add_investigator( vector, investigator ):
-    return add_to_list( vector, investigator )
+def addInvestigator( vector, investigator ):
+    return addToList( vector, investigator )
 
-def remove_investigator( vector, investigator ):
-    return remove_from_list( vector, investigator )
+def removeInvestigator( vector, investigator ):
+    return removeFromList( vector, investigator )
 
-def advance_current_phase( integer ):
-    return cycle_int( integer, 4 )
+def advanceCurrentPhase( integer ):
+    return cycleInt( integer, 4 )
 
-def toggle_bookkeeping( integer ):
-    return cycle_int( integer, 2 )
+def toggleBookkeeping( integer ):
+    return cycleInt( integer, 2 )
 
-def set_ancient_one( vector, ancient_one ):
-    return add_to_list( vector, ancient_one )
+def setAncientOne( vector, ancientOne ):
+    return addToList( vector, ancientOne )
 
-def set_awakened( awakened ):
+def setAwakened( awakened ):
     return awakened + 1
 
-def inc_doom_track( integer ):
+def incDoomTrack( integer ):
     return integer + 1
 
-def dec_doom_track( integer ):
+def decDoomTrack( integer ):
     return integer - 1
 
-def inc_terror_track( integer ):
+def incTerrorTrack( integer ):
     return integer + 1
 
-def dec_terror_track( integer ):
+def decTerrorTrack( integer ):
     return integer - 1
 
-def inc_gates_in_arkham( integer ):
+def incGatesInArkham( integer ):
     return integer + 1
 
-def dec_gates_in_arkham( integer ):
+def decGatesInArkham( integer ):
     return integer - 1
 
-def inc_gates_sealed( integer ):
+def incGatesSealed( integer ):
     return integer + 1
 
-def dec_gates_sealed( integer ):
+def decGatesSealed( integer ):
     return integer - 1
 
-def inc_clues_to_seal( integer ):
+def incCluesToSeal( integer ):
     return integer + 1
 
-def dec_clues_to_seal( integer ):
+def decCluesToSeal( integer ):
     return integer - 1
 
-def inc_gates_closed_to_win( vector ):
+def incGatesClosedToWin( vector ):
     return [ vector[0] + 1, vector[1] ]
 
-def dec_gates_closed_to_win( vector ):
+def decGatesClosedToWin( vector ):
     return [ vector[0] - 1, vector[1] ]
 
-def inc_seals_to_win( vector ):
+def incSealsToWin( vector ):
     return [ vector[0], vector[1] + 1 ]
 
-def dec_seals_to_win( vector ):
+def decSealsToWin( vector ):
     return [ vector[0], vector[1] -1 ]
 
-def inc_monster_count( integer ):
+def incMonsterCount( integer ):
     return integer + 1
 
-def dec_monster_count( integer ):
+def decMonsterCount( integer ):
     return integer - 1
 
-def remove_monster_limit( integer ):
+def removeMonsterLimit( integer ):
     """Intended for removing the monster limit"""
     return float('-inf')
 
-def inc_outskirts_count( integer ):
+def incOutskirtsCount( integer ):
     return integer + 1
 
-def dec_outskirts_count( integer ):
+def decOutskirtsCount( integer ):
     return integer - 1
 
-def add_monster_location( vector, dimension, location ):
+def addMonsterLocation( vector, dimension, location ):
     return [ locs + [location] if dim == dimension else locs for dim, locs in enumerate( vector ) ]
 
-def remove_monster_location( vector, dimension, location ):
+def removeMonsterLocation( vector, dimension, location ):
     return [ locs[:locs.index(location)] + locs[locs.index(location)+1:] if dim == dimension else locs for dim, locs in enumerate( vector ) ] 
+
+# mythos
+
+def setTitle( banner, title ):
+    ic( banner, title )
+    return banner._replace( title=title )
+
+def setDescription( banner, description ):
+    return banner._replace( description=description )
+
+def setMythosMvmtPoints( modifiers, mvmtPoints ):
+    return modifiers._replace( mvmtPoints=mvmtPoints )
+
+def setMythosSpeed( modifiers, speed ):
+    return modifiers._replace( speed=speed )
+
+def setMythosSneak( modifiers, sneak ):
+    return modifiers._replace( sneak=sneak )
+
+def setMythosFight( modifiers, fight ):
+    return modifiers._replace( fight=fight )
+
+def setMythosWill( modifiers, will ):
+    return modifiers._replace( will=will )
+
+def setMythosLore( modifiers, lore ):
+    return modifiers._replace( lore=lore )
+
+def setMythosLuck( modifiers, luck ):
+    return modifiers._replace( luck=luck )
+
+def setBannedMonster( mythos, bannedMonster ):
+    return bannedMonster
+
+def setResolution( mythos, resolution ):
+    return resolution
 
 # locations
 
-def add_occupant( location_occupants, new_occupant ):
+def addOccupant( locationOccupants, newOccupant ):
     db( 3 )
-    return add_to_list( location_occupants, new_occupant )
+    return addToList( locationOccupants, newOccupant )
 
-def remove_occupant( location_occupants, old_occupant ):
+def removeOccupant( locationOccupants, oldOccupant ):
     db( 3 )
-    return remove_from_list( location_occupants, old_occupant )
+    return removeFromList( locationOccupants, oldOccupant )
 
-def add_gate_to( location_gate_to, new_gate ):
+def addGateTo( locationGateTo, newGate ):
     db( 3 )
-    return add_to_list( location_gate_to, new_gate )
+    return addToList( locationGateTo, newGate )
 
-def remove_gate_to( location_gate_to, old_gate ):
+def removeGateTo( locationGateTo, oldGate ):
     db( 3 )
-    return remove_from_list( location_gate_to, old_gate )
+    return removeFromList( locationGateTo, oldGate )
     
-def inc_loc_clues( location ):
+def incLocClues( location ):
     db( 3 )
     return increase( location, 'clues' )
 
-def dec_loc_clues( location ):
+def decLocClues( location ):
     db( 3 )
     return decrease( location, 'clues' )
 
-def inc_historical_clues( location ):
+def incHistoricalClues( location ):
     db( 3 )
-    return increase( location, 'historical_clues' )
+    return increase( location, 'historicalClues' )
 
-def dec_historical_clues( location ):
+def decHistoricalClues( location ):
     db( 3 )
-    return decrease( location, 'historical_clues' )
+    return decrease( location, 'historicalClues' )
 
-def add_seal( location ):
+def addSeal( location ):
     db( 3 )
     return increase( location, 'sealed' )
 
-def remove_seal( location ):
+def removeSeal( location ):
     db( 3 )
     return decrease( location, 'sealed' )
 
-def add_gate( location ):
+def addGate( location ):
     db( 3 )
     return increase( location, 'gate' )
 
-def remove_gate( location ):
+def removeGate( location ):
     db( 3 )
     return decrease( location, 'gate' )
 
-def inc_historical_gates( location ):
+def incHistoricalGates( location ):
     db( 3 )
-    return increase( location, 'historical_gates' )
+    return increase( location, 'historicalGates' )
 
-def dec_historical_gates( location ):
+def decHistoricalGates( location ):
     db( 3 )
-    return decrease( location, 'historical_gates' )
+    return decrease( location, 'historicalGates' )
 
-def add_explored( location ):
+def addExplored( location ):
     db( 3 )
     return increase( location, 'explored' )
 
-def remove_explored( location ):
+def removeExplored( location ):
     db( 3 )
     return decrease( location, 'explored' )
 
-def add_closed( location ):
+def addClosed( location ):
     db( 3 )
     return increase( location, 'closed' ) 
 
-def remove_closed( location ):
+def removeClosed( location ):
     db( 3 )
     return decrease( location, 'closed' )
 
+def permanentlyClose( location ):
+    db( 3 )
+    return location._replace( closed=float('inf') )
+
+def addPassable( location ):
+    db( 3 )
+    return increase( location, 'passable' ) 
+
+def removePassable( location ):
+    db( 3 )
+    return decrease( location, 'passable' )
+
+# graph
+
+def addAdjacency( table: Table, x: int, y: int ):
+    """ Add a 1 to an adj table, signifying that y joins x """
+    return Table([ [ 1 if m == x and n == y else u for m,u in enumerate( table.table[n] ) ] for n,v in enumerate( table.table ) ])
+
+def removeAdjacency( table: Table, x: int, y: int ):
+    """ Add a 0 to an adj table, signifying that y disjoins x """
+    return Table([ [ 0 if m == x and n == y else u for m,u in enumerate( table.table[n] ) ] for n,v in enumerate( table.table ) ])
+
 # monsters
 
-def set_movement( rulesets, move_rules ):
+def setMovement( rulesets, moveRules ):
     db( 3 )
-    return rulesets._replace( movement=move_rules )
+    return rulesets._replace( movement=moveRules )
 
-def set_combat( rulesets, combat_rules ):
+def setCombat( rulesets, combatRules ):
     db( 3 )
-    return rulesets._replace( combat=combat_rules )
+    return rulesets._replace( combat=combatRules )
 
-def set_evade( rulesets, evade_rules ):
+def setEvade( rulesets, evadeRules ):
     db( 3 )
-    return rulesets._replace( evade=evade_rules )
+    return rulesets._replace( evade=evadeRules )
 
-def add_ambush( abilities ):
+def addAmbush( abilities ):
     db( 3 )
     return increase( abilities, 'ambush' )
 
-def remove_ambush( abilities ):
+def removeAmbush( abilities ):
     db( 3 )
     return decrease( abilities, 'ambush' )
 
-def add_endless( abilities ):
+def addEndless( abilities ):
     db( 3 )
     return increase( abilities, 'endless' )
 
-def remove_endless( abilities ):
+def removeEndless( abilities ):
     db( 3 )
     return decrease( abilities, 'endless' )
 
-def add_undead( abilities ):
+def addUndead( abilities ):
     db( 3 )
     return increase( abilities, 'undead' )
 
-def remove_undead( abilities ):
+def removeUndead( abilities ):
     db( 3 )
     return decrease( abilities, 'undead' )
 
-def set_physical_immunity( abilities ):
+def setPhysicalImmunity( abilities ):
     db( 3 )
     return abilities._replace( physical=0 )
 
-def set_physical_resistance( abilities ):
+def setPhysicalResistance( abilities ):
     db( 3 )
     return abilities._replace( physical=0.5 )
 
-def remove_physical( abilities ):
+def removePhysical( abilities ):
     db( 3 )
     return abilities._replace( physical=1 )
 
-def set_magical_immunity( abilities ):
+def setMagicalImmunity( abilities ):
     db( 3 )
     return abilities._replace( magical=0 )
 
-def set_magical_resistance( abilities ):
+def setMagicalResistance( abilities ):
     db( 3 )
     return abilities._replace( magical=0.5 )
 
-def remove_magical( abilities ):
+def removeMagical( abilities ):
     db( 3 )
     return abilities._replace( magical=1 )
 
-def inc_nightmarish( abilities ):
+def incNightmarish( abilities ):
     db( 3 )
     return increase( abilities, 'nightmarish' )
 
-def dec_nightmarish( abilities ):
+def decNightmarish( abilities ):
     db( 3 )
     return decrease( abilities, 'nightmarish' )
 
-def inc_overwhelming( abilities ):
+def incOverwhelming( abilities ):
     db( 3 )
     return increase( abilities, 'overwhelming' )
 
-def dec_overwhelming( abilities ):
+def decOverwhelming( abilities ):
     db( 3 )
     return decrease( abilities, 'overwhelming' )
 
-def inc_awareness( stats ):
+def incAwareness( stats ):
     db( 3 )
     return increase( stats, 'awareness' )
 
-def dec_awareness( stats ):
+def decAwareness( stats ):
     db( 3 )
     return decrease( stats, 'awareness' )
 
-def inc_toughness( stats ):
+def incToughness( stats ):
     db( 3 )
     return increase( stats, 'toughness' )
 
-def dec_toughness( stats ):
+def decToughness( stats ):
     db( 3 )
     return decrease( stats, 'toughness' )
 
-def inc_horror_mod( stats ):
+def incHorrorMod( stats ):
     db( 3 )
-    return increase( stats, 'horror_mod' )
+    return increase( stats, 'horrorMod' )
 
-def dec_horror_mod( stats ):
+def decHorrorMod( stats ):
     db( 3 )
-    return decrease( stats, 'horror_mod' )
+    return decrease( stats, 'horrorMod' )
 
-def inc_horror_received( stats ):
+def incHorrorReceived( stats ):
     db( 3 )
     return increase( stats, 'horror' )
 
-def dec_horror_received( stats ):
+def decHorrorReceived( stats ):
     db( 3 )
     return decrease( stats, 'horror' )
 
-def inc_combat_mod( stats ):
+def incCombatMod( stats ):
     db( 3 )
-    return increase( stats, 'combat_mod' )
+    return increase( stats, 'combatMod' )
 
-def dec_combat_mod( stats ):
+def decCombatMod( stats ):
     db( 3 )
-    return decrease( stats, 'combat_mod' )
+    return decrease( stats, 'combatMod' )
 
-def inc_damage_received( stats ):
+def incDamageReceived( stats ):
     db( 3 )
     return increase( stats, 'damage' )
 
-def dec_damage_received( stats ):
+def decDamageReceived( stats ):
     db( 3 )
     return decrease( stats, 'damage' )
 
 # investigators
 
-def inc_max_damage( damage ):
+def incMaxDamage( damage ):
     db( 3 )
-    return increase( damage, 'max_damage' )
+    return increase( damage, 'maxDamage' )
 
-def dec_max_damage( damage ):
+def decMaxDamage( damage ):
     db( 3 )
-    return decrease( damage, 'max_damage' )
+    return decrease( damage, 'maxDamage' )
 
-def inc_current_damage( damage ):
+def incCurrentDamage( damage ):
     db( 3 )
-    return increase( damage, 'current_damage' )
+    return increase( damage, 'currentDamage' )
 
-def dec_current_damage( damage ):
+def decCurrentDamage( damage ):
     db( 3 )
-    return decrease( damage, 'current_damage' )
+    return decrease( damage, 'currentDamage' )
 
-def set_unconscious( damage ):
+def setUnconscious( damage ):
     db( 3 )
     return increase( damage, 'unconscious' )
 
-def set_conscious( damage ):
+def setConscious( damage ):
     db( 3 )
     return decrease( damage, 'unconscious' )
 
-def inc_max_horror( horror ):
+def incMaxHorror( horror ):
     db( 3 )
-    return increase( horror, 'max_horror' )
+    return increase( horror, 'maxHorror' )
 
-def dec_max_horror( horror ):
+def decMaxHorror( horror ):
     db( 3 )
-    return decrease( horror, 'max_horror' )
+    return decrease( horror, 'maxHorror' )
 
-def inc_current_horror( horror ):
+def incCurrentHorror( horror ):
     db( 3 )
-    return increase( horror, 'current_horror' )
+    return increase( horror, 'currentHorror' )
 
-def dec_current_horror( horror ):
+def decCurrentHorror( horror ):
     db( 3 )
-    return decrease( horror, 'current_horror' )
+    return decrease( horror, 'currentHorror' )
 
-def set_insane( horror ):
+def setInsane( horror ):
     db( 3 )
     return increase( horror, 'insane' )
 
-def set_sane( horror ):
+def setSane( horror ):
     db( 3 )
     return decrease( horror, 'insane' )
 
-def add_lost_in_time_and_space( conditions ):
+def addLostInTimeAndSpace( conditions ):
     db( 3 )
-    return increase( conditions, 'lost_in_time_and_space' )
+    return increase( conditions, 'lostInTimeAndSpace' )
 
-def remove_lost_in_time_and_space( conditions ):
+def removeLostInTimeAndSpace( conditions ):
     db( 3 )
-    return decrease( conditions, 'lost_in_time_and_space' )
+    return decrease( conditions, 'lostInTimeAndSpace' )
 
-def add_delayed( conditions ):
+def addDelayed( conditions ):
     db( 3 )
     return increase( conditions, 'delayed' )
 
-def remove_delayed( conditions ):
+def removeDelayed( conditions ):
     db( 3 )
     return decrease( conditions, 'delayed' )
 
-def add_arrested( conditions ):
+def addArrested( conditions ):
     db( 3 )
     return increase( conditions, 'arrested' )
 
-def remove_arrested( conditions ):
+def removeArrested( conditions ):
     db( 3 )
     return decrease( conditions, 'arrested' )
 
-def add_retainer( conditions ):
+def setUnarrestable( conditions ):
+    db( 3 )
+    return conditions._replace( arrested=float('inf') )
+
+def setArrestable( conditions ):
+    db( 3 )
+    return conditions._replace( arrested=0 )
+
+def addRetainer( conditions ):
     db( 3 )
     return increase( conditions, 'retainer' )
 
-def remove_retainer( conditions ):
+def removeRetainer( conditions ):
     db( 3 )
     return decrease( conditions, 'retainer' )
 
-def add_bank_loan( conditions ):
+def addBankLoan( conditions ):
     db( 3 )
-    return increase( conditions, 'bank_loan' )
+    return increase( conditions, 'bankLoan' )
 
-def remove_bank_loan( conditions ):
+def removeBankLoan( conditions ):
     db( 3 )
-    return decrease( conditions, 'bank_loan' )
+    return decrease( conditions, 'bankLoan' )
 
-def set_bankrupt( conditions ):
+def setBankrupt( conditions ):
     db( 3 )
-    return conditions._replace( bank_loan=float('inf') )
+    return conditions._replace( bankLoan=float('inf') )
 
-def add_stl_membership( conditions ):
+def addStlMembership( conditions ):
     db( 3 )
-    return increase( conditions, 'stl_membership' )
+    return increase( conditions, 'stlMembership' )
 
-def remove_stl_membership( conditions ):
+def removeStlMembership( conditions ):
     db( 3 )
-    return decrease( conditions, 'stl_membership' )
+    return decrease( conditions, 'stlMembership' )
 
-def add_deputized( conditions ):
+def addDeputized( conditions ):
     db( 3 )
     return increase( conditions, 'deputized' )
 
-def remove_deputized( conditions ):
+def removeDeputized( conditions ):
     db( 3 )
     return decrease( conditions, 'deputized' )
 
-def add_blessing( conditions ):
+def addBlessing( conditions ):
     db( 3 )
-    return increase( conditions, 'blessed_cursed' )
+    return increase( conditions, 'blessedCursed' )
 
-def remove_blessing( conditions ):
+def removeBlessing( conditions ):
     db( 3 )
-    return decrease( conditions, 'blessed_cursed' )
+    return decrease( conditions, 'blessedCursed' )
 
-def add_curse( conditions ):
+def addCurse( conditions ):
     db( 3 )
-    return add_blessing( conditions )
+    return addBlessing( conditions )
 
-def remove_curse( conditions ):
+def removeCurse( conditions ):
     db( 3 )
-    return remove_blessing( conditions )
+    return removeBlessing( conditions )
 
 # skills
 
-def inc_max_focus( focus ):
+def incMaxFocus( focus ):
     db( 3 )
-    return increase( focus, 'max_focus' )
+    return increase( focus, 'maxFocus' )
 
-def dec_max_focus( focus ):
+def decMaxFocus( focus ):
     db( 3 )
-    return decrease( focus, 'max_focus' )
+    return decrease( focus, 'maxFocus' )
 
-def inc_current_focus( focus ):
+def incCurrentFocus( focus ):
     db( 3 )
-    return increase( focus, 'current_focus' )
+    return increase( focus, 'currentFocus' )
 
-def dec_current_focus( focus ):
+def decCurrentFocus( focus ):
     db( 3 )
-    return decrease( focus, 'current_focus' )
+    return decrease( focus, 'currentFocus' )
 
-def inc_max_speed( speed ):
+def incMaxSpeed( speed ):
     db( 3 )
-    return increase( speed, 'max_speed' )
+    return increase( speed, 'maxSpeed' )
 
-def dec_max_speed( speed ):
+def decMaxSpeed( speed ):
     db( 3 )
-    return decrease( speed, 'max_speed' )
+    return decrease( speed, 'maxSpeed' )
 
-def inc_current_speed( speed ):
+def incCurrentSpeed( speed ):
     db( 3 )
-    return increase( speed, 'current_speed' )
+    return increase( speed, 'currentSpeed' )
 
-def dec_current_speed( speed ):
+def decCurrentSpeed( speed ):
     db( 3 )
-    return decrease( speed, 'current_speed' )
+    return decrease( speed, 'currentSpeed' )
 
-def inc_current_sneak( speed ):
+def incCurrentSneak( speed ):
     db( 3 )
-    return decrease( speed, 'current_speed' )
+    return decrease( speed, 'currentSpeed' )
 
-def dec_current_sneak( speed ):
+def decCurrentSneak( speed ):
     db( 3 )
-    return increase( speed, 'current_speed' )
+    return increase( speed, 'currentSpeed' )
 
-def inc_sum_speed_sneak( speed ):
+def incSumSpeedSneak( speed ):
     db( 3 )
-    return increase( speed, 'speed_sneak_sum' )
+    return increase( speed, 'speedSneakSum' )
 
-def dec_sum_speed_sneak( speed ):
+def decSumSpeedSneak( speed ):
     db( 3 )
-    return decrease( speed, 'speed_sneak_sum' )
+    return decrease( speed, 'speedSneakSum' )
 
-def inc_max_fight( fight ):
+def incMaxFight( fight ):
     db( 3 )
-    return increase( fight, 'max_fight' )
+    return increase( fight, 'maxFight' )
 
-def dec_max_fight( fight ):
+def decMaxFight( fight ):
     db( 3 )
-    return decrease( fight, 'max_fight' )
+    return decrease( fight, 'maxFight' )
 
-def inc_current_fight( fight ):
+def incCurrentFight( fight ):
     db( 3 )
-    return increase( fight, 'current_fight' )
+    return increase( fight, 'currentFight' )
 
-def dec_current_fight( fight ):
+def decCurrentFight( fight ):
     db( 3 )
-    return decrease( fight, 'current_fight' )
+    return decrease( fight, 'currentFight' )
 
-def inc_current_will( fight ):
+def incCurrentWill( fight ):
     db( 3 )
-    return decrease( fight, 'current_fight' )
+    return decrease( fight, 'currentFight' )
 
-def dec_current_will( fight ):
+def decCurrentWill( fight ):
     db( 3 )
-    return increase( fight, 'current_fight' )
+    return increase( fight, 'currentFight' )
 
-def inc_sum_fight_will( fight ):
+def incSumFightWill( fight ):
     db( 3 )
-    return increase( fight, 'fight_will_sum' )
+    return increase( fight, 'fightWillSum' )
 
-def dec_sum_fight_will( fight ):
+def decSumFightWill( fight ):
     db( 3 )
-    return decrease( fight, 'fight_will_sum' )
+    return decrease( fight, 'fightWillSum' )
 
-def inc_max_lore( lore ):
+def incMaxLore( lore ):
     db( 3 )
-    return increase( lore, 'max_lore' )
+    return increase( lore, 'maxLore' )
 
-def dec_max_lore( lore ):
+def decMaxLore( lore ):
     db( 3 )
-    return decrease( lore, 'max_lore' )
+    return decrease( lore, 'maxLore' )
 
-def inc_current_lore( lore ):
+def incCurrentLore( lore ):
     db( 3 )
-    return increase( lore, 'current_lore' )
+    return increase( lore, 'currentLore' )
 
-def dec_current_lore( lore ):
+def decCurrentLore( lore ):
     db( 3 )
-    return decrease( lore, 'current_lore' )
+    return decrease( lore, 'currentLore' )
 
-def inc_current_luck( fight ):
+def incCurrentLuck( fight ):
     db( 3 )
-    return decrease( fight, 'current_fight' )
+    return decrease( fight, 'currentFight' )
 
-def dec_current_luck( fight ):
+def decCurrentLuck( fight ):
     db( 3 )
-    return increase( fight, 'current_fight' )
+    return increase( fight, 'currentFight' )
 
-def inc_sum_lore_luck( lore ):
+def incSumLoreLuck( lore ):
     db( 3 )
-    return increase( lore, 'lore_luck_sum' )
+    return increase( lore, 'loreLuckSum' )
 
-def dec_sum_lore_luck( lore ):
+def decSumLoreLuck( lore ):
     db( 3 )
-    return decrease( lore, 'lore_luck_sum' )
+    return decrease( lore, 'loreLuckSum' )
 
-def change_location( location, new_loc_id ):
+def changeLocation( location, newLocId ):
     db( 3 )
-    return location._replace( current_location=new_loc_id )
+    return location._replace( currentLocation=newLocId )
 
-def inc_mvmt_points( location ):
+def incMvmtPoints( location ):
     db( 3 )
-    return increase( location, 'mvmt_points' )
+    return increase( location, 'mvmtPoints' )
 
-def dec_mvmt_points( location ):
+def decMvmtPoints( location ):
     db( 3 )
-    return decrease( location, 'mvmt_points' )
+    return decrease( location, 'mvmtPoints' )
 
-def add_in_arkham( location ):
+def addInArkham( location ):
     db( 3 )
-    return increase( location, 'in_arkham' )
+    return increase( location, 'inArkham' )
 
-def remove_in_arkham( location ):
+def removeInArkham( location ):
     db( 3 )
-    return decrease( location, 'in_arkham' )
+    return decrease( location, 'inArkham' )
 
-def inc_hands( equipped_items ):
+def incHands( equippedItems ):
     db( 3 )
-    return increase( equipped_items, 'hands' )
+    return increase( equippedItems, 'hands' )
 
-def dec_hands( equipped_items ):
+def decHands( equippedItems ):
     db( 3 )
-    return decrease( equipped_items, 'hands' )
+    return decrease( equippedItems, 'hands' )
 
-def equip_item( equipped_items, item ):
+def equipItem( equippedItems, item ):
     db( 3 )
-    return equipped_items._replace( equipment = add_to_list( equipped_items, item ) )
+    return equippedItems._replace( equipment = addToList( equippedItems, item ) )
 
-def dequip_item( equipped_items, item ):
+def dequipItem( equippedItems, item ):
     db( 3 )
-    return equipped_items._replace( equipment = remove_from_list( equipped_items, item ) )
+    return equippedItems._replace( equipment = removeFromList( equippedItems, item ) )
 
-def exhaust_item( exhausted_items, item ):
+def exhaustItem( exhaustedItems, item ):
     db( 3 )
-    return add_to_list( exhausted_items, item )
+    return addToList( exhaustedItems, item )
 
-def refresh_exhausted( exhausted_items ):
+def refreshExhausted( exhaustedItems ):
     db( 3 )
-    return exhausted_items[:0] 
+    return exhaustedItems[:0] 
 
 # possessions
 
-def inc_money( possessions ):
+def incMoney( possessions ):
     db( 3 )
     return { k:(v+1 if k == 'money' else v) for k,v in possessions.items() }
 
-def dec_money( possessions ):
+def decMoney( possessions ):
     db( 3 )
     return { k:(v-1 if k == 'money' else v) for k,v in possessions.items() }
 
-def inc_inv_clues( possessions ):
+def incInvClues( possessions ):
     db( 3 )
     return { k:(v+1 if k == 'clues' else v) for k,v in possessions.items() }
 
-def dec_inv_clues( possessions ):
+def decInvClues( possessions ):
     db( 3 )
     return { k:(v-1 if k == 'clues' else v) for k,v in possessions.items() }
 
-def inc_gate_trophies( possessions ):
+def incGateTrophies( possessions ):
     db( 3 )
-    return { k:(v+1 if k == 'gate_trophies' else v) for k,v in possessions.items() }
+    return { k:(v+1 if k == 'gateTrophies' else v) for k,v in possessions.items() }
 
-def dec_gate_trophies( possessions ):
+def decGateTrophies( possessions ):
     db( 3 )
-    return { k:(v-1 if k == 'gate_trophies' else v) for k,v in possessions.items() }
+    return { k:(v-1 if k == 'gateTrophies' else v) for k,v in possessions.items() }
 
-def inc_monster_trophies( possessions ):
+def incMonsterTrophies( possessions ):
     db( 3 )
-    return { k:(v+1 if k == 'monster_trophies' else v) for k,v in possessions.items() }
+    return { k:(v+1 if k == 'monsterTrophies' else v) for k,v in possessions.items() }
 
-def dec_monster_trophies( possessions ):
+def decMonsterTrophies( possessions ):
     db( 3 )
-    return { k:(v-1 if k == 'monster_trophies' else v) for k,v in possessions.items() }
+    return { k:(v-1 if k == 'monsterTrophies' else v) for k,v in possessions.items() }
 
-def add_item( possessions, variety, item ):
+def addItem( possessions, variety, item ):
     db( 3 )
     return { k:(v+[item] if k == variety else v) for k,v in possessions.items() }
 
-def remove_item( possessions, variety, item ):
+def removeItem( possessions, variety, item ):
     db( 3 )
     return { k:( v[:v.index(item)] + v[v.index(item)+1:] if k == variety else v) for k,v in possessions.items() }
 
-def add_weapon( possessions, item ):
+def addWeapon( possessions, item ):
     db( 3 )
-    return add_item( possessions, 'weapons', item )
+    return addItem( possessions, 'weapons', item )
     
-def remove_weapon_item( possessions, item ):
+def removeWeaponItem( possessions, item ):
     db( 3 )
-    return remove_item( possessions, 'weapons', item )
+    return removeItem( possessions, 'weapons', item )
 
-def add_consumable_item( possessions, item ):
+def addConsumableItem( possessions, item ):
     db( 3 )
-    return add_item( possessions, 'consumables', item )
+    return addItem( possessions, 'consumables', item )
 
-def remove_consumable_item( possessions, item ):
+def removeConsumableItem( possessions, item ):
     db( 3 )
-    return remove_item( possessions, 'consumables', item )
+    return removeItem( possessions, 'consumables', item )
 
-def add_tome_item( possessions, item ):
+def addTomeItem( possessions, item ):
     db( 3 )
-    return add_item( possessions, 'tomes', item )
+    return addItem( possessions, 'tomes', item )
 
-def remove_tome_item( possessions, item ):
+def removeTomeItem( possessions, item ):
     db( 3 )
-    return remove_item( possessions, 'tomes', item )
+    return removeItem( possessions, 'tomes', item )
 
-def add_passive_buff( possessions, item ):
+def addPassiveBuff( possessions, item ):
     db( 3 )
-    return add_item( possessions, 'passive_buffs', item )
+    return addItem( possessions, 'passiveBuffs', item )
 
-def remove_passive_buff( possessions, item ):
+def removePassiveBuff( possessions, item ):
     db( 3 )
-    return remove_item( possessions, 'passive_buffs', item )
+    return removeItem( possessions, 'passiveBuffs', item )
 
-def add_active_buff( possessions, item ):
+def addActiveBuff( possessions, item ):
     db( 3 )
-    return add_item( possessions, 'active_buffs', item )
+    return addItem( possessions, 'activeBuffs', item )
 
-def remove_active_buff( possessions, item ):
+def removeActiveBuff( possessions, item ):
     db( 3 )
-    return remove_item( possessions, 'active_buffs', item )
+    return removeItem( possessions, 'activeBuffs', item )
 
-def add_oddity_item( possessions, item ):
+def addOddityItem( possessions, item ):
     db( 3 )
-    return add_item( possessions, 'oddities', item )
+    return addItem( possessions, 'oddities', item )
 
-def remove_oddity_item( possessions, item ):
+def removeOddityItem( possessions, item ):
     db( 3 )
-    return remove_item( possessions, 'oddities', item )
+    return removeItem( possessions, 'oddities', item )
 
-def add_spell( possessions, spell ):
+def addSpell( possessions, spell ):
     db( 3 )
-    return add_item( possessions, 'spells', spell )
+    return addItem( possessions, 'spells', spell )
 
-def remove_spell( possessions, spell ):
+def removeSpell( possessions, spell ):
     db( 3 )
-    return remove_item( possessions, 'spells', spell )
+    return removeItem( possessions, 'spells', spell )
 
-def add_ally( possessions, ally ):
+def addAlly( possessions, ally ):
     db( 3 )
-    return add_item( possessions, 'allies', ally )
+    return addItem( possessions, 'allies', ally )
 
-def remove_ally( possessions, ally ):
+def removeAlly( possessions, ally ):
     db( 3 )
-    return remove_item( possessions, 'allies', ally )
+    return removeItem( possessions, 'allies', ally )
 
 # non-specific item transforms
 
-def inc_price( item ):
+def incPrice( item ):
     """ Increases the item price """
     db( 3 )
     return increase( item, 'price' )
 
-def dec_price( item ):
+def decPrice( item ):
     """ Decreases the item price """
     db( 3 )
     return decrease( item, 'price' )
 
-def inc_bonus( item ):
+def incBonus( item ):
     """ Increases item bonus """
     db( 3 )
     return increase( item, 'bonus' )
 
-def dec_bonus( item ):
+def decBonus( item ):
     """ Decreases item bonus """
     db( 3 )
     return decrease( item, 'bonus' )
 
-def inc_sanity_cost( item ):
+def incSanityCost( item ):
     """ Increases item sanity cost """
     db( 3 )
-    return increase( item, 'sanity_cost' )
+    return increase( item, 'sanityCost' )
 
-def dec_sanity_cost( item ):
+def decSanityCost( item ):
     """ Decrease item sanity cost """
     db( 3 )
-    return decrease( item, 'sanity_cost' )
+    return decrease( item, 'sanityCost' )
 
 # weapons-specific transforms
 
-def change_modality( weapon ):
+def changeModality( weapon ):
     """ Changes a physical weapon in a magical one, a magical into physical """
     db( 3 )
     return cycle( weapon, 'modality', 2 )
 
-def change_exhaustable( weapon ):
+def changeExhaustable( weapon ):
     """ Makes a non-exhaustible weapon exhaustable, exhaustible to non """
     db( 3 )
     return cycle( weapon, 'exhaustable', 2 )
 
-def change_losable( weapon ):
+def changeLosable( weapon ):
     """ Makes a non-losable weapon losable, losable to non """
     db( 3 )
     return cycle( weapon, 'losable', 2 )
 
 # gates
 
-def inc_gate_modifier( gate ):
+def incGateModifier( gate ):
     db( 3 )
     return increase( gate, 'modifier' )
 
-def dec_gate_modifier( gate ):
+def decGateModifier( gate ):
     db( 3 )
     return decrease( gate, 'modifier' )
