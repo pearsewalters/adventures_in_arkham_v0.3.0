@@ -1,73 +1,81 @@
-from tools import Table
+from classes.table import Table
 
 board = {
     'investigators'         :   [ ],
-    'current_player'        :   [ ],
-    'current_phase'         :   [ ],
+    'currentPlayer'        :   [ ],
+    'currentPhase'         :   [ ],
     'bookkeeping'           :   [ ],
-    'ancient_one'           :   [ ],
+    'ancientOne'           :   [ ],
     'awakened'              :   [ ],
-    'doom_track'            :   [ ],
-    'terror_track'          :   [ ],
-    'gates_in_arkham'       :   [ ],
-    'gates_sealed'          :   [ ],
-    'clues_to_seal'         :   [ ],
-    'win_cond'              :   [ ],
-    'gate_limit'            :   [ ],
-    'monsters_in_arkham'    :   [ ],
-    'monsters_in_outskirts' :   [ ],
-    'monster_locations'     :   [ ]
+    'doomTrack'            :   [ ],
+    'terrorTrack'          :   [ ],
+    'gatesInArkham'       :   [ ],
+    'gatesSealed'          :   [ ],
+    'cluesToSeal'         :   [ ],
+    'winCond'              :   [ ],
+    'gateLimit'            :   [ ],
+    'monstersInArkham'    :   [ ],
+    'monstersInOutskirts' :   [ ],
+    'monsterLocations'     :   [ ]
 }
 
 locations = Table([
-    ['name',                            'investigators',    'occupants',    'gate_to',  'status'    ],
-    ['CURIOSITIE SHOPPE',               [],                 [],             [],         []          ],
-    [ 'NEWSPAPER' ,                     [],                 [],             [],         []          ],
-    ['TRAIN STATION',                   [],                 [],             [],         []          ],
-    ['ARKHAM ASYLUM',                   [],                 [],             [],         []          ],
-    ['BANK OF ARKHAM',                  [],                 [],             [],         []          ],
-    ['INDEPENDENCE SQUARE',             [],                 [],             [],         []          ],
-    ['HIBB\'S ROADHOUSE',               [],                 [],             [],         []          ],
-    ['POLICE STATION',                  [],                 [],             [],         []          ],
-    ['JAIL CELL',                       [],                 [],             [],         []          ],
-    ['VELMA\'S DINER',                  [],                 [],             [],         []          ],
-    ['RIVER DOCKS',                     [],                 [],             [],         []          ],
-    ['THE UNNAMABLE',                   [],                 [],             [],         []          ],
-    ['UNVISITED ISLE',                  [],                 [],             [],         []          ],
-    ['BLACK CAVE',                      [],                 [],             [],         []          ],
-    ['GENERAL STORE',                   [],                 [],             [],         []          ],
-    ['GRAVEYARD',                       [],                 [],             [],         []          ],
-    ['ADMINISTRATION',                  [],                 [],             [],         []          ],
-    ['SCIENCE BUILDING',                [],                 [],             [],         []          ],
-    ['LIBRARY',                         [],                 [],             [],         []          ],
-    ['THE WITCH HOUSE',                 [],                 [],             [],         []          ],
-    ['THE SILVER TWILIGHT LODGE',       [],                 [],             [],         []          ],
-    ['THE INNER SANCTUM',               [],                 [],             [],         []          ],
-    ['ST. MARY\'S HOSPITAL',            [],                 [],             [],         []          ],
-    ['WOODS',                           [],                 [],             [],         []          ],
-    ['YE OLDE MAGICK SHOPPE',           [],                 [],             [],         []          ],
-    ['MA\'S BOARDING HOUSE',            [],                 [],             [],         []          ],
-    ['HISTORICAL SOCIETY',              [],                 [],             [],         []          ],
-    ['SOUTH CHURCH',                    [],                 [],             [],         []          ],
-    ['NORTHSIDE STREETS',               [],                 [],             [],         []          ],
-    ['DOWNTOWN STREETS',                [],                 [],             [],         []          ],
-    ['EASTTOWN STREETS',                [],                 [],             [],         []          ],
-    ['MERCHANT DISTRICT STREETS',       [],                 [],             [],         []          ],
-    ['RIVERTOWN STREETS',               [],                 [],             [],         []          ],
-    ['MISKATONIC UNIVERSITY STREETS',   [],                 [],             [],         []          ],
-    ['FRENCH HILL STREETS',             [],                 [],             [],         []          ],
-    ['UPTOWN STREETS',                  [],                 [],             [],         []          ],
-    ['SOUTHSIDE STREETS',               [],                 [],             [],         []          ],
-    ['OUTSKIRTS',                       [],                 [],             [],         []          ],
-    ['THE SKY',                          [],                 [],             [],         []          ],
-    ['R\'LYEH',                         [],                 [],             [],         []          ],
-    ['PLATEAU OF LENG',                 [],                 [],             [],         []          ],
-    ['THE DREAMLANDS',                  [],                 [],             [],         []          ],
-    ['GREAT HALL OF CELEANO',           [],                 [],             [],         []          ],
-    ['YUGGOTH',                         [],                 [],             [],         []          ],
-    ['CITY OF THE GREAT RACE',          [],                 [],             [],         []          ],
-    ['ABYSS',                           [],                 [],             [],         []          ],
-    ['ANOTHER DIMENSION',               [],                 [],             [],         []          ]
+    ['name',                                            'investigators',    'occupants',    'gateTo',  'status'    ],
+    ['CURIOSITIE SHOPPE',                               [],                 [],             [],         []          ],
+    [ 'NEWSPAPER' ,                                     [],                 [],             [],         []          ],
+    ['TRAIN STATION',                                   [],                 [],             [],         []          ],
+    ['ARKHAM ASYLUM',                                   [],                 [],             [],         []          ],
+    ['BANK OF ARKHAM',                                  [],                 [],             [],         []          ],
+    ['INDEPENDENCE SQUARE',                             [],                 [],             [],         []          ],
+    ['HIBB\'S ROADHOUSE',                               [],                 [],             [],         []          ],
+    ['POLICE STATION',                                  [],                 [],             [],         []          ],
+    ['JAIL CELL',                                       [],                 [],             [],         []          ],
+    ['VELMA\'S DINER',                                  [],                 [],             [],         []          ],
+    ['RIVER DOCKS',                                     [],                 [],             [],         []          ],
+    ['THE UNNAMABLE',                                   [],                 [],             [],         []          ],
+    ['UNVISITED ISLE',                                  [],                 [],             [],         []          ],
+    ['BLACK CAVE',                                      [],                 [],             [],         []          ],
+    ['GENERAL STORE',                                   [],                 [],             [],         []          ],
+    ['GRAVEYARD',                                       [],                 [],             [],         []          ],
+    ['ADMINISTRATION',                                  [],                 [],             [],         []          ],
+    ['SCIENCE BUILDING',                                [],                 [],             [],         []          ],
+    ['LIBRARY',                                         [],                 [],             [],         []          ],
+    ['THE WITCH HOUSE',                                 [],                 [],             [],         []          ],
+    ['THE SILVER TWILIGHT LODGE',                       [],                 [],             [],         []          ],
+    ['THE INNER SANCTUM',                               [],                 [],             [],         []          ],
+    ['ST. MARY\'S HOSPITAL',                            [],                 [],             [],         []          ],
+    ['WOODS',                                           [],                 [],             [],         []          ],
+    ['YE OLDE MAGICK SHOPPE',                           [],                 [],             [],         []          ],
+    ['MA\'S BOARDING HOUSE',                            [],                 [],             [],         []          ],
+    ['HISTORICAL SOCIETY',                              [],                 [],             [],         []          ],
+    ['SOUTH CHURCH',                                    [],                 [],             [],         []          ],
+    ['NORTHSIDE STREETS',                               [],                 [],             [],         []          ],
+    ['DOWNTOWN STREETS',                                [],                 [],             [],         []          ],
+    ['EASTTOWN STREETS',                                [],                 [],             [],         []          ],
+    ['MERCHANT DISTRICT STREETS',                       [],                 [],             [],         []          ],
+    ['RIVERTOWN STREETS',                               [],                 [],             [],         []          ],
+    ['MISKATONIC UNIVERSITY STREETS',                   [],                 [],             [],         []          ],
+    ['FRENCH HILL STREETS',                             [],                 [],             [],         []          ],
+    ['UPTOWN STREETS',                                  [],                 [],             [],         []          ],
+    ['SOUTHSIDE STREETS',                               [],                 [],             [],         []          ],
+    ['OUTSKIRTS',                                       [],                 [],             [],         []          ],
+    ['THE SKY',                                         [],                 [],             [],         []          ],
+    ["R'LYEH",                                          [],                 [],             [],         []          ],
+    ["NIGHTMARE CORPSE-CITY",                           [],                 [],             [],         []          ],
+    ['THE PLATEAU OF LENG',                             [],                 [],             [],         []          ],
+    ['HIDEOUS TABLELANDS',                              [],                 [],             [],         []          ],
+    ["THE DREAMLANDS",                                  [],                 [],             [],         []          ],
+    ["CARTER'S QUEST",                                  [],                 [],             [],         []          ],
+    ['THE GREAT HALL OF CELEANO',                       [],                 [],             [],         []          ],
+    ['THE STOLEN LIBRARY',                              [],                 [],             [],         []          ],
+    ['YUGGOTH',                                         [],                 [],             [],         []          ],
+    ['FUNGOID PLANET',                                  [],                 [],             [],         []          ],
+    ['THE CITY OF THE GREAT RACE',                      [],                 [],             [],         []          ],
+    ['PNAKOTUS',                                        [],                 [],             [],         []          ],
+    ['THE ABYSS',                                       [],                 [],             [],         []          ],
+    ['HOME OF LIVING SHADOW',                           [],                 [],             [],         []          ],
+    ['ANOTHER DIMENSION',                               [],                 [],             [],         []          ],
+    ['THE ALTERNATIVE WORLD',                           [],                 [],             [],         []          ]
 ])
 
 monsters = Table([
@@ -103,10 +111,10 @@ monsters = Table([
     ['ZOMBIE',                   [  ],          [  ],         [  ]     ],
 ])
 
-monster_cup = [ ]
+monsterCup = [ ]
 
 investigators = Table([
-    ['name',            'damage',   'horror',   'conditions',   'focus',   'speed',   'fight',   'lore',    'location', 'random_possessions',    'equipped_items',   'exhausted_items', 'possessions'   ],
+    ['name',            'damage',   'horror',   'conditions',   'focus',   'speed',   'fight',   'lore',    'location', 'randomPossessions',    'equippedItems',   'exhaustedItems', 'possessions'   ],
     ['Amanda Sharpe',   [],         [],         [],             [],        [],       [],         [],        [],         [],                      [],                 [],                []              ],
     ['"Ashcan" Pete',   [],         [],         [],             [],        [],       [],         [],        [],         [],                      [],                 [],                []              ],
     ['Bob Jenkins',     [],         [],         [],             [],        [],       [],         [],        [],         [],                      [],                 [],                []              ],
@@ -125,7 +133,7 @@ investigators = Table([
     ['Vincent Lee',     [],         [],         [],             [],        [],       [],         [],        [],         [],                      [],                 [],                []              ]
 ])
 
-weapons = [
+weapons = Table([
     ['name',                'stats'                                 ],
     ['.22 DERRINGER',       [  ]                                    ],
     ['.38 REVOLVER',        [  ]                                    ],
@@ -145,68 +153,64 @@ weapons = [
     ['POWDER OF IBN-GHAZI', [  ]                                    ],
     ['SWORD OF GLORY',      [  ]                                    ],
     ['LAMP OF ALHAZRED',    [  ]                                    ]
-]
+])
 
-weapons_deck = [ ]
+weaponsDeck = [ ]
 
-consumables = [
-    ['name',                    'bonus',    'price' ],
-    ['FOOD',                    -1,         1       ],
-    ['WHISKEY',                 -1,         1       ],
-    ['LUCKY CIGARETTE CASE',    0,          1       ],
-    ['RESEARCH MATERIALS',      1,          1       ]
-]
+consumables = Table([
+    ['name',                    'stats',  ],
+    ['FOOD',                    [ ],      ],
+    ['WHISKEY',                 [ ],      ],
+    ['LUCKY CIGARETTE CASE',    [ ],      ],
+    ['RESEARCH MATERIALS',      [ ],      ]
+])
 
-consumables_deck = {
-    'FOOD'                  : 2,
-    'WHISKEY'               : 2,
-    'LUCKY CIGARETTE CASE'  : 2,
-    'RESEARCH MATERIALS'    : 2
-}
+consumablesDeck = [ ]
 
-tomes = [
-    ['name',                'mvmt_cost',     'sanity_cost',    'modifier', 'price' ],
-    ['OLD JOURNAL',         [],              [],              [],         []       ],
-    ['ANCIENT TOME',        [],              [],              [],         []       ],
-    ['BOOK OF DZYAN',       [],              [],              [],         []       ],
-    ['CABALA OF SABOTH',    [],              [],              [],         []       ],
-    ['CULTES DES GOULES',   [],              [],              [],         []       ],
-    ['NAMELESS CULTES',     [],              [],              [],         []       ],
-    ['NECRONOMICON',        [],              [],              [],         []       ],
-    ['THE KING IN YELLOW',  [],              [],              [],         []       ]
-]
 
-tomes_deck = [ ]
+tomes = Table([
+    ['name',                'stats',     ],
+    ['OLD JOURNAL',         [],          ],
+    ['ANCIENT TOME',        [],          ],
+    ['BOOK OF DZYAN',       [],          ],
+    ['CABALA OF SABOTH',    [],          ],
+    ['CULTES DES GOULES',   [],          ],
+    ['NAMELESS CULTES',     [],          ],
+    ['NECRONOMICON',        [],          ],
+    ['THE KING IN YELLOW',  [],          ]
+])
 
-passive_buffs = [
-    ['name',            'bonus',    'price'  ],
-    ['DARK CLOAK',      [],         []       ],
-    ['LANTERN',         [],         []       ],
-    ['PALLID MASK',     [],         []       ],
-    ["RUBY OF R'LYEH",  [],         []       ],
-    ['SPEED',           [],         []       ],
-    ['SNEAK',           [],         []       ],
-    ['FIGHT',           [],         []       ],
-    ['WILL',            [],         []       ],
-    ['LORE',            [],         []       ],
-    ['LUCK',            [],         []       ],
-]
+tomesDeck = [ ]
 
-passive_buffs_deck = [ ]
+passiveBuffs = Table([
+    ['name',            'stats'      ],
+    ['DARK CLOAK',      [],          ],
+    ['LANTERN',         [],          ],
+    ['PALLID MASK',     [],          ],
+    ["RUBY OF R'LYEH",  [],          ],
+    ['SPEED',           [],          ],
+    ['SNEAK',           [],          ],
+    ['FIGHT',           [],          ],
+    ['WILL',            [],          ],
+    ['LORE',            [],          ],
+    ['LUCK',            [],          ],
+])
 
-active_buffs = [
-    ['name',                'bonus',    'price' ],
-    ['MAP OF ARKHAM',       [ ],          [ ]       ],
-    ['MOTORCYCLE',          [ ],          [ ]       ],
-    ['BRAVERY',             [ ],          [ ]       ],
-    ['STEALTH',             [ ],          [ ]       ],
-    ['EXPERT OCCULTIST',    [ ],          [ ]       ],
-    ['MARKSMAN',            [ ],          [ ]       ]
-]
+passiveBuffsDeck = [ ]
 
-active_buffs_deck = [ ]
+activeBuffs = Table([
+    ['name',                'stats',    ],
+    ['MAP OF ARKHAM',       [ ],        ],
+    ['MOTORCYCLE',          [ ],        ],
+    ['BRAVERY',             [ ],        ],
+    ['STEALTH',             [ ],        ],
+    ['EXPERT OCCULTIST',    [ ],        ],
+    ['MARKSMAN',            [ ],        ]
+])
 
-oddities = [
+activeBuffsDeck = [ ]
+
+oddities = Table([
     ['name',                        'price'           ],
     ['ALIEN STATUE',                [ ]               ],
     ['BLUE WATCHER OF THE PYRAMID', [ ]               ],
@@ -219,24 +223,40 @@ oddities = [
     ['WARDING STATUE',              [ ]               ],
     ['ELDER SIGN',                  [ ]               ],
     ['ENCHANTED JEWELRY',           [ ]               ]
-]
+])
 
-oddities_deck = [ ]
+odditiesDeck = [ ]
 
-spells_deck = [ ]
+spellsDeck = [ ]
 
-allies_deck = [ ]
+alliesDeck = [ ]
 
 gates = Table([
     ['name',                        'modifier'  ],
-    ['YUGGOTH',                     []          ],
-    ['THE CITY OF THE GREAT RACE',  []          ],
-    ['THE PLATEAU OF LENG',         []          ],
-    ['THE ABYSS',                   []          ],
     ['ANOTHER DIMENSION',           []          ],
-    ['THE GREAT HALL OF CELEANO',   []          ],
+    ['THE ABYSS',                   []          ],
+    ['THE CITY OF THE GREAT RACE',  []          ],
     ['THE DREAMLANDS',              []          ],
+    ['THE GREAT HALL OF CELEANO',   []          ],
+    ['THE PLATEAU OF LENG',         []          ],
     ["R'LYEH",                      []          ],
+    ['YUGGOTH',                     []          ],
 ])
 
-gates_deck = [ ]
+gatesDeck = [ ]
+
+mythosEffects = {
+    'headline'      : [],
+    'mystic'        : [],
+    'urban'         : [],
+    'weather'       : [],
+    'modifiers'     : [],
+    'resolution'    : [],
+    'bannedMonster' : []
+}
+
+mythosDeck = [ ]
+
+graph = [ ]
+leftGraph = [ ]
+rightGraph = [ ]
