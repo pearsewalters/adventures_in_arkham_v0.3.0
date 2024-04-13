@@ -1,184 +1,218 @@
-import math, traceback, phases, currency, transformers, commands, tools, constraints, params
+import math, traceback, phases, transformers, commands, params
+from tools import adjacencies, currentLocationsDesc, debugger, setLimit
+from classes.table import Table
+from classes.context import Context
 from tables import constants, defaults, transformations
-from tools import Table, adjacencies, debugger
-from context import Context
-import ancient_ones
+import currency
+import ancientOnes
 
 from icecream import ic
 
-# create location matrix
-graph, left_graph, right_graph = adjacencies( 'locations.csv' )
 
-phase_bookkeeping = {
+phaseBookkeeping = {
     0 : phases.mythos,
     1 : phases.upkeep,
     2 : phases.movement,
     3 : phases.encounters
 }
 
-def next_frame() -> Context:
+graph, leftGraph, rightGraph = adjacencies( 'locations.csv' )
+
+def nextFrame() -> Context:
     debugger( 0 )
-    return Context(**{
-        'board' : {
-            'phase' : currency.board_current_phase( defaults.board['current_phase'], transformations.board['current_phase'] ),
-            'bookkeeping' : currency.board_bookkeeping( defaults.board['bookkeeping'], transformations.board['bookkeeping'] ),
-            'win' : currency.board_win_cond( defaults.board['win_cond'], transformations.board['win_cond'] ),
-            'gates_open' : currency.board_gates_in_arkham( defaults.board['gates_in_arkham'], transformations.board['gates_in_arkham'] ),
+    return Context( **{
+            'board' : {
+            'phase' : currency.boardCurrentPhase( defaults.board['currentPhase'], transformations.board['currentPhase'] ),
+            'bookkeeping' : currency.boardBookkeeping( defaults.board['bookkeeping'], transformations.board['bookkeeping'] ),
+            'win' : currency.boardWinCond( defaults.board['winCond'], transformations.board['winCond'] ),
+            'gatesOpen' : currency.boardGatesInArkham( defaults.board['gatesInArkham'], transformations.board['gatesInArkham'] ),
             'defs' : defaults.board,
             'trans' : transformations.board
         },
+        'mythos' : {
+            'headline' : currency.mythosHeadline( defaults.mythosEffects['headline'], transformations.mythosEffects['headline'] ),
+            'mystic' : currency.mythosMystic( defaults.mythosEffects['mystic'], transformations.mythosEffects['mystic'] ),
+            'urban' : currency.mythosUrban( defaults.mythosEffects['urban'], transformations.mythosEffects['urban'] ),
+            'weather' : currency.mythosWeather( defaults.mythosEffects['weather'], transformations.mythosEffects['weather'] ),
+            'mvmtPoints' : currency.mythosModifiers( defaults.mythosEffects['modifiers'], transformations.mythosEffects['modifiers'] ).mvmtPoints,
+            'speed' : currency.mythosModifiers( defaults.mythosEffects['modifiers'], transformations.mythosEffects['modifiers'] ).speed,
+            'sneak' : currency.mythosModifiers( defaults.mythosEffects['modifiers'], transformations.mythosEffects['modifiers'] ).sneak,
+            'fight' : currency.mythosModifiers( defaults.mythosEffects['modifiers'], transformations.mythosEffects['modifiers'] ).fight,
+            'will' : currency.mythosModifiers( defaults.mythosEffects['modifiers'], transformations.mythosEffects['modifiers'] ).will,
+            'lore' : currency.mythosModifiers( defaults.mythosEffects['modifiers'], transformations.mythosEffects['modifiers'] ).lore,
+            'luck' : currency.mythosModifiers( defaults.mythosEffects['modifiers'], transformations.mythosEffects['modifiers'] ).luck,
+            'resolution' : currency.mythosResolution( defaults.mythosEffects['resolution'],transformations.mythosEffects['resolution'] ),
+            'cons' : constants.mythosEffects,
+            'defs' : defaults.mythosEffects,
+            'trans' : transformations.mythosEffects,
+            'deckDefaults' : defaults.mythosDeck,
+            'deckTransforms' : transformations.mythosDeck
+        },
         'briefs' : {
-            'names' : currency.board_investigators( defaults.board['investigators'], transformations.board['investigators'] ),
-            'defs' : defaults.investigators,
-            'trans' : transformations.investigators
+            'names' : currency.boardInvestigators( defaults.board['investigators'], transformations.board['investigators'] ),
+             'cons' : Table( [constants.investigators.table[0]] + [ constants.investigators.row( inv, bundled=False ) for inv in INVESTIGATORS ] ), 
+             'defs' : Table( [defaults.investigators.table[0]] + [ defaults.investigators.row( inv, bundled=False ) for inv in INVESTIGATORS ] ),
+            'trans' : Table( [transformations.investigators.table[0]] + [ transformations.investigators.row( inv, bundled=False ) for inv in INVESTIGATORS ] ),
+             'locs' : [ currency.investigatorLocation( defaults.investigators.row( inv ).location, transformations.investigators.row( inv ).location ) for inv in INVESTIGATORS ]
         },
         'locations' : {
-            'cons' : constants.locations,
-            'defs' : defaults.locations,
-            'trans' : transformations.locations,
-            'currents' : tools.current_locations_desc( defaults.locations, transformations.locations ),
-            'graph' : graph,
-            'left_graph' : left_graph,
-            'right_graph' : right_graph
+                  'cons' : constants.locations,
+                  'defs' : defaults.locations,
+                 'trans' : transformations.locations,
+              'currents' : currentLocationsDesc( defaults.locations, transformations.locations ),
+                 'graph' : graph,
+             'leftGraph' : leftGraph,
+            'rightGraph' : rightGraph
+        },
+        'graph' : {
+                   'graphDefaults' : defaults.graph,
+               'leftGraphDefaults' : defaults.leftGraph,
+              'rightGraphDefaults' : defaults.rightGraph,
+                 'graphTransforms' : transformations.graph,
+             'leftGraphTransforms' : transformations.leftGraph,
+            'rightGraphTransforms' : transformations.rightGraph
         },
         'monsters' : {
             'cons' : constants.monsters,
             'defs' : defaults.monsters,
             'trans' : transformations.monsters,
-            'deck_defaults' : defaults.monster_cup,
-            'deck_transforms' : transformations.monster_cup
+            'deckDefaults' : defaults.monsterCup,
+            'deckTransforms' : transformations.monsterCup
         },
         'weapons' : {
             'cons' : constants.weapons,
             'defs' : defaults.weapons,
             'trans' : transformations.weapons,
-            'deck_defaults' : defaults.weapons_deck,
-            'deck_transforms' : transformations.weapons_deck
+            'deckDefaults' : defaults.weaponsDeck,
+            'deckTransforms' : transformations.weaponsDeck
         },
         'consumables' : {
             'cons' : constants.consumables,
             'defs' : defaults.consumables,
             'trans' : transformations.consumables,
-            'deck_defaults' : defaults.consumables_deck,
-            'deck_transforms' : transformations.consumables_deck
+            'deckDefaults' : defaults.consumablesDeck,
+            'deckTransforms' : transformations.consumablesDeck
         },
         'tomes' : {
             'cons' : constants.tomes,
             'defs' : defaults.tomes,
             'trans' : transformations.tomes,
-            'deck_defaults' : defaults.tomes_deck,
-            'deck_transforms' : transformations.tomes_deck
+            'deckDefaults' : defaults.tomesDeck,
+            'deckTransforms' : transformations.tomesDeck
         },
-        'passive_buffs' : {
-            'cons' : constants.passive_buffs,
-            'defs' : defaults.passive_buffs,
-            'trans' : transformations.passive_buffs,
-            'deck_defaults' : defaults.passive_buffs_deck,
-            'deck_transforms' : transformations.passive_buffs_deck
+        'passiveBuffs' : {
+            'cons' : constants.passiveBuffs,
+            'defs' : defaults.passiveBuffs,
+            'trans' : transformations.passiveBuffs,
+            'deckDefaults' : defaults.passiveBuffsDeck,
+            'deckTransforms' : transformations.passiveBuffsDeck
         },
-        'active_buffs' : {
-            'cons' : constants.active_buffs,
-            'defs' : defaults.active_buffs,
-            'trans' : transformations.active_buffs,
-            'deck_defaults' : defaults.active_buffs_deck,
-            'deck_transforms' : transformations.active_buffs_deck
+        'activeBuffs' : {
+            'cons' : constants.activeBuffs,
+            'defs' : defaults.activeBuffs,
+            'trans' : transformations.activeBuffs,
+            'deckDefaults' : defaults.activeBuffsDeck,
+            'deckTransforms' : transformations.activeBuffsDeck
         },
         'oddities' : {
             'cons' : constants.oddities,
             'defs' : defaults.oddities,
             'trans' : transformations.oddities,
-            'deck_defaults' : defaults.oddities_deck,
-            'deck_transforms' : transformations.oddities_deck
+            'deckDefaults' : defaults.odditiesDeck,
+            'deckTransforms' : transformations.odditiesDeck
         },
         'spells' : {
             'cons' : constants.spells,
             'defs' : None,
             'trans' : None,
-            'deck_defaults' : defaults.spells_deck,
-            'deck_transforms' : transformations.spells_deck
+            'deckDefaults' : defaults.spellsDeck,
+            'deckTransforms' : transformations.spellsDeck
         },
         'allies' : {
             'cons' : constants.allies,
             'defs' : None,
             'trans' : None,
-            'deck_defaults' : defaults.allies_deck,
-            'deck_transforms' : transformations.allies_deck
+            'deckDefaults' : defaults.alliesDeck,
+            'deckTransforms' : transformations.alliesDeck
         },
         'gates' : {
             'cons' : constants.gates,
             'defs' : defaults.gates,
             'trans' : transformations.gates,
-            'deck_defaults' : defaults.gates_deck,
-            'deck_transforms' : transformations.gates_deck
+            'deckDefaults' : defaults.gatesDeck,
+            'deckTransforms' : transformations.gatesDeck
         },
-        'investigator' : currency.board_investigators( defaults.board['investigators'], transformations.board['investigators'] )[ currency.board_current_player( defaults.board['current_player'], transformations.board['current_player'] ) ],
+        'investigator' : {
+            'name'  : currency.boardInvestigators( defaults.board['investigators'], transformations.board['investigators'] )[ currency.boardCurrentPlayer( defaults.board['currentPlayer'], transformations.board['currentPlayer'] ) ],
+            'cons'  : constants.investigators.row( currency.boardInvestigators( defaults.board['investigators'], transformations.board['investigators'] )[ currency.boardCurrentPlayer( defaults.board['currentPlayer'], transformations.board['currentPlayer'] ) ] ),
+            'defs'  : defaults.investigators.row( currency.boardInvestigators( defaults.board['investigators'], transformations.board['investigators'] )[ currency.boardCurrentPlayer( defaults.board['currentPlayer'], transformations.board['currentPlayer'] ) ] ),
+            'trans' : transformations.investigators.row( currency.boardInvestigators( defaults.board['investigators'], transformations.board['investigators'] )[ currency.boardCurrentPlayer( defaults.board['currentPlayer'], transformations.board['currentPlayer'] ) ] )
+        }
     })
 
 
 # game defaults
 
 INVESTIGATORS = [ "Sister Mary", "Vincent Lee", "Jenny Barnes", "Harvey Walters" ]
+# INVESTIGATORS = ["Vincent Lee", "Carolyn Fern"]
 ANCIENT_ONE = "AZATHOTH"
 
 # set investigators
 for inv in INVESTIGATORS:
-    transformations.board['investigators'].append( ( transformers.add_investigator, inv ) )
+    transformations.board['investigators'].append( ( transformers.addInvestigator, inv ) )
     transformations.locations.row( 
         constants.investigators.row( inv ).home
-    ).investigators += [ ( transformers.add_occupant, inv ) ]
+    ).investigators += [ ( transformers.addOccupant, inv ) ]
     # set win condition
-    transformations.board['win_cond'].append( transformers.inc_gates_closed_to_win )
+    transformations.board['winCond'].append( transformers.incGatesClosedToWin )
     
 
 # set ancient one and apply rules
-transformations.board['ancient_one'].append( ( transformers.set_ancient_one, ANCIENT_ONE ) )
+transformations.board['ancientOne'].append( ( transformers.setAncientOne, ANCIENT_ONE ) )
     
-ancient_ones.RULES[ ANCIENT_ONE ]( next_frame() )
+ancientOnes.RULES[ ANCIENT_ONE ]( nextFrame() )
 
 # set gate limit
-tools.set_limit( transformations.board['gates_in_arkham'], transformers.dec_gates_in_arkham, params.GATE_LIMIT, x=len( INVESTIGATORS ) )
+setLimit( transformations.board['gatesInArkham'], transformers.decGatesInArkham, params.GATE_LIMIT, x=len( INVESTIGATORS ) )
 
 # set monster limit
-tools.set_limit( transformations.board['monsters_in_arkham'], transformers.dec_monster_count,  params.MONSTER_LIMIT, x=len( INVESTIGATORS ) )
+setLimit( transformations.board['monstersInArkham'], transformers.decMonsterCount,  params.MONSTER_LIMIT, x=len( INVESTIGATORS ) )
 
 # set outskirts limit
-tools.set_limit( transformations.board['monsters_in_outskirts'], transformers.dec_monster_count,  params.OUTSKIRTS_LIMIT, x=len( INVESTIGATORS ) )
+setLimit( transformations.board['monstersInOutskirts'], transformers.decMonsterCount,  params.OUTSKIRTS_LIMIT, x=len( INVESTIGATORS ) )
  
 # begin game loop
 
-if currency.board_awakened( defaults.board['awakened'], transformations.board['awakened'] ):
-    print( 'The Ancient One has risen!' )
-else:
-    phases.mythos( next_frame() )
+# if currency.boardAwakened( defaults.board['awakened'], transformations.board['awakened'] ):
+#     print( 'The Ancient One has risen!' )
+# else:
+#     phases.mythos( nextFrame() )
 
-for location in tools.current_locations_desc( defaults.locations, transformations.locations ).filter( 'occupants', [], "!="):
-    ic( location.name, location.occupants )
-
-# phases.upkeep( next_frame() )
-
-# phases.mythos_funcs.move_monsters( next_frame() )
+# phases.mythos( nextFrame() )
+# phases.upkeep( nextFrame() )
+# phases.movement( nextFrame() )
+# phases.encounters( nextFrame() )
 
 
-
-def game_loop():
+def gameLoop():
 
     while True:
 
         ## set new context for loop
-        context = next_frame()
+        context = nextFrame()
 
         ## check for win condition
-        if context.board.win[0] == 0 and context.board.gates_open == 0:
+        if context.board.win[0] == 0 and context.board.gatesOpen == 0:
             print(f'\x1b[38;5;70m\n\n{" "*20}The ancient one is banished! You\'ve saved Arkham and the world!\n\n' )
             break
 
         ## phase bookkeeping
-        if context.board.bookkeeping and phase_bookkeeping[ context.board.phase ]:
-            phase_bookkeeping[ context.board.phase ]( context )
+        if context.board.bookkeeping and phaseBookkeeping[ context.board.phase ]:
+            phaseBookkeeping[ context.board.phase ]( context )
 
         # build command dictionary 
-        val_com = { k:v for k,v in commands.phase_commands[ context.board.phase ].items() }
-        val_com.update( commands.anytime_commands )
+        valCom = { k:v for k,v in commands.phaseCommands[ context.board.phase ].items() }
+        valCom.update( commands.anytimeCommands )
 
         # receive and process command
         sentence = input( f'\x1b[38;5;70m>>> ' ).strip().lower().split(' ')
@@ -186,22 +220,22 @@ def game_loop():
         command = ic( sentence[0] )
         arguments = ic( sentence[1:] )
 
-        if command not in val_com:
+        if command not in valCom:
             print( 'Hmm...unsure what you want. Try again. Type "commands" to see a list of valid commands.' )
         elif command == 'quit':
-            if commands.quit_game():
+            if commands.quitGame():
                 break 
         elif command == 'commands':
-            print( commands.show_commands( val_com ) )
+            print( commands.showCommands( valCom ) )
         else:
             try:
                 if len( arguments ):
-                    msg = val_com[command][0]( context, *arguments ) 
+                    msg = valCom[command][0]( context, *arguments ) 
                 else:
-                    msg = val_com[command][0]( context )
+                    msg = valCom[command][0]( context )
                 # if command returns a message, print it 
                 if msg:
                     print( f'\x1b[38;5;70m{msg}' )
             except TypeError as error:
-                traceback.print_tb( None )
+                traceback.printTb( None )
                 print( f'ERROR: {error}' )
