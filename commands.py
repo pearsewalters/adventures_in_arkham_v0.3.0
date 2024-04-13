@@ -1,9 +1,10 @@
-import time, transformers, constraints, phases, tools
-from context import Context
+from classes.context import Context
+import currency, investigatorFuncs, transformers, constraints, phases
+
 from params import DEBUG_LVL
 from icecream import ic
 
-def quit_game():
+def quitGame():
     """ Will exit the game loop """
     confirm = input( 'Are you sure you want to quit? (y/n) ' ).strip().lower()
     if confirm == 'y':
@@ -18,7 +19,7 @@ def show_args( args ):
         return msg
     return "No available args\n"
 
-def show_commands( commands ):
+def showCommands( commands ):
     """ Displays list of commands """
     if commands:
         msg = 'Available commands: \n'
@@ -27,7 +28,7 @@ def show_commands( commands ):
         return msg
     return "No available commands\n"
 
-def show( context: Context, view ):
+def show( context, view ):
     """ Dispatch for show_view functions """
     views = {
         'status' : ( show_status, "Display investigator health and conditions"),
@@ -40,7 +41,7 @@ def show( context: Context, view ):
         return 'That is not a valid view. Try again.' 
     return views[view][0]( context )
 
-def show_possessions( context: Context ):
+def show_possessions( context ):
     """ Displays investigator possessions """
 
     nickname = context.investigator.nickname
@@ -225,7 +226,7 @@ def show_possessions( context: Context ):
 
     return display + '\n'
 
-def show_status( context: Context ):
+def show_status( context ):
     """ Displays investigator health, location, and conditions """
     nickname = context.investigator.nickname
     
@@ -281,7 +282,7 @@ def show_status( context: Context ):
 
     return display + '\n'
 
-def show_skills( context: Context ):
+def show_skills( context ):
     """ Displays investigator skills"""
 
     nickname = context.investigator.nickname
@@ -316,7 +317,7 @@ def show_skills( context: Context ):
 
     return display
 
-def equip( context: Context, *args ):
+def equip( context, *args ):
     """ Equips a weapon on the investigator in context """
     weapon = ' '.join( [w.upper() for w in args] )
 
@@ -340,12 +341,12 @@ def equip( context: Context, *args ):
 
     
     for hand in range( weapon_desc.hands ):
-        context.investigator.transforms.equipped_items += [ transformers.dec_hands ]
-    context.investigator.transforms.equipped_items += [ ( transformers.equip_item, weapon ) ]
+        context.investigator.transforms.equipped_items += [ transformers.decHands ]
+    context.investigator.transforms.equipped_items += [ ( transformers.equipItem, weapon ) ]
 
     return f'{nickname} has equipped {weapon}\n'
 
-def dequip( context: Context, *args ):
+def dequip( context, *args ):
 
     weapon = ' '.join( [w.upper() for w in args] )
 
@@ -365,14 +366,14 @@ def dequip( context: Context, *args ):
         return f'{nickname} does not have {weapon} equipped'
     
     for hand in range( weapon_desc.hands ):
-        context.investigator.transforms.equipped_items += [ transformers.inc_hands ]
+        context.investigator.transforms.equipped_items += [ transformers.incHands ]
     context.investigator.transforms.equipped_items += [ ( transformers.unequip, weapon ) ]
 
     return f'{nickname} has dequipped {weapon}\n'
 
 def move( context: Context ):
 
-    if not constraints.movement_pts_constraint( context.investigator.defaults.location, transformers.dec_mvmt_points, context.investigator.transforms.location ):
+    if not constraints.investigatorMvmtPoints( context.investigator.defaults.location, transformers.decMvmtPoints, context.investigator.transforms.location ):
         return f'{context.investigator.nickname} no longer has any movement points.\n'
 
     # get current location of investigator
@@ -421,19 +422,23 @@ def move( context: Context ):
         return f'{context.investigator.nickname} is staying where they are\n'
     else:
         # new location is neighbor's num_id
-        new_loc = neighbors[ reply-1 ][ 1 ]
-        context.investigator.transforms.location += [ (transformers.change_location, new_loc) ]
-        context.investigator.transforms.location += [ transformers.dec_mvmt_points ]
-
+        newLocID = neighbors[ reply-1 ][ 1 ]
+        investigatorFuncs.relocateInvestigator( context, context.investigator.defaults, context.investigator.transforms, newLocID )
+        # if investigator ends movement where there is a gate, decrease mvmt points to 0
+        if context.locations.currents[newLocID].status.gate == 1:
+            context.investigator.transforms.location += [ transformers.decMvmtPoints ] * currency.investigatorLocation( context.investigator.defaults.location, context.investigator.transforms.location ).mvmt_points
+        else:
+            context.investigator.transforms.location += [ transformers.decMvmtPoints ]
+            
         return f'{context.investigator.nickname} has moved to {neighbors[ reply-1 ][0]}\n'
 
-def refresh( context: Context ):
+def refresh( context ):
 
-    context.investigator.transforms.exhausted_items += [ transformers.refresh_exhausted ]
+    context.investigator.transforms.exhausted_items += [ transformers.refreshExhausted ]
 
     return f'{context.investigator.nickname} has refreshed their items'
 
-def increase( context: Context, skill ):
+def increase( context, skill ):
 
     skill_funcs = {
         'speed' : ( transformers.inc_current_speed, "Speed is your overall quickness. It informs your movement points, as well as speed-based skill checks" ),
@@ -447,7 +452,7 @@ def increase( context: Context, skill ):
     if skill.lower() == 'args':
         return show_args( skill_funcs )
 
-    enough_focus = constraints.focus_constraint( context.investigator.defaults.focus, transformers.dec_current_focus, context.investigator.transforms.focus )
+    enough_focus = constraints.investigatorFocus( context.investigator.defaults.focus, transformers.dec_current_focus, context.investigator.transforms.focus )
 
     if not enough_focus:
         return f"{context.investigator.nickname} doesn't have enough focus to adjust their skills" 
@@ -456,21 +461,21 @@ def increase( context: Context, skill ):
         return "Oops! That's not a real skill. Try again"
     
     if skill == 'speed' or skill == 'sneak':
-        can_inc = constraints.skills_constraint( context.investigator.defaults.speed, skill_funcs[skill][0], context.investigator.transforms.speed )
+        can_inc = constraints.investigatorSkills( context.investigator.defaults.speed, skill_funcs[skill][0], context.investigator.transforms.speed )
         if can_inc:
             context.investigator.transforms.speed += [ skill_funcs[skill][0] ]
         else:
             return f"{context.investigator.nickname} can't increase their {skill} beyond the maximum"
 
     if skill == 'fight' or skill == 'will':
-        can_inc = constraints.skills_constraint( context.investigator.defaults.fight, skill_funcs[skill][0], context.investigator.transforms.fight )
+        can_inc = constraints.investigatorSkills( context.investigator.defaults.fight, skill_funcs[skill][0], context.investigator.transforms.fight )
         if can_inc:
             context.investigator.transforms.fight += [ skill_funcs[skill][0] ]
         else:
             return f"{context.investigator.nickname} can't increase their {skill} beyond the maximum"
 
     if skill == 'lore' or skill == 'luck':
-        can_inc = constraints.skills_constraint( context.investigator.defaults.lore, skill_funcs[skill][0], context.investigator.transforms.lore )
+        can_inc = constraints.investigatorSkills( context.investigator.defaults.lore, skill_funcs[skill][0], context.investigator.transforms.lore )
         if can_inc:
             context.investigator.transforms.lore += [ skill_funcs[skill][0] ]
         else:
@@ -480,7 +485,7 @@ def increase( context: Context, skill ):
     context.investigator.transforms.focus [ transformers.dec_current_focus ]
     return f"{context.investigator.nickname} has increased their {skill}"
 
-def decrease( context: Context, skill ):
+def decrease( context, skill ):
 
     skill_funcs = {
         'speed' : ( transformers.dec_current_speed, "Speed is your overall quickness. It informs your movement points, as well as speed-based skill checks" ),
@@ -494,7 +499,7 @@ def decrease( context: Context, skill ):
     if skill.lower() == 'args':
         return show_args( skill_funcs )
 
-    enough_focus = constraints.focus_constraint( context.investigator.defaults.focus, transformers.dec_current_focus, context.investigator.transforms.focus )
+    enough_focus = constraints.investigatorFocus( context.investigator.defaults.focus, transformers.dec_current_focus, context.investigator.transforms.focus )
 
     if not enough_focus:
         return f"{context.investigator.nickname} doesn't have enough focus to adjust their skills" 
@@ -503,21 +508,21 @@ def decrease( context: Context, skill ):
         return "Oops! That's not a real skill. Try again"
     
     if skill == 'speed' or skill == 'sneak':
-        can_inc = constraints.skills_constraint( context.investigator.defaults.speed, skill_funcs[skill][0], context.investigator.transforms.speed )
+        can_inc = constraints.investigatorSkills( context.investigator.defaults.speed, skill_funcs[skill][0], context.investigator.transforms.speed )
         if can_inc:
             context.investigator.transforms.speed += [ skill_funcs[skill][0] ]
         else:
             return f"{context.investigator.nickname} can't decrease their {skill} beyond the minimum"
 
     if skill == 'fight' or skill == 'WILL':
-        can_inc = constraints.skills_constraint( context.investigator.defaults.fight, skill_funcs[skill][0], context.investigator.transforms.fight )
+        can_inc = constraints.investigatorSkills( context.investigator.defaults.fight, skill_funcs[skill][0], context.investigator.transforms.fight )
         if can_inc:
             context.investigator.transforms.fight += [ skill_funcs[skill][0] ]
         else:
             return f"{context.investigator.nickname} can't decrease their {skill} beyond the minimum"
 
     if skill == 'lore' or skill == 'luck':
-        can_inc = constraints.skills_constraint( context.investigator.defaults.lore, skill_funcs[skill][0], context.investigator.transforms.lore )
+        can_inc = constraints.investigatorSkills( context.investigator.defaults.lore, skill_funcs[skill][0], context.investigator.transforms.lore )
         if can_inc:
             context.investigator.transforms.lore += [ skill_funcs[skill][0] ]
         else:
@@ -538,7 +543,7 @@ def next_phase( context, *args ):
     # advance next phase
     context.board.transforms['current_phase'] += [ transformers.advance_current_phase ]
     # set bookkeeping flag to true
-    context.board.transforms['bookkeeping'] += [ transformers.toggle_bookkeeping ]
+    context.board.transforms['bookkeeping'] += [ transformers.toggleBookkeeping ]
     
     # inform the player
     print( f'Beginning the { phase_names[ (context.board.phase + 1) % 4 ] } phase\n' )
@@ -548,12 +553,12 @@ def next_phase( context, *args ):
     return None
 
 anytime_commands = {
-    'commands' : (show_commands, "Shows this list of commands"),
+    'commands' : (showCommands, "Shows this list of commands"),
     'show' : (show, "Use to display a view. Try 'show status' or 'show possessions'"),
     'equip' : (equip, "Equips an item. Try 'equip item'"),
     'dequip' : (dequip, "Dequips and item. Try 'dequip item'"),
     'next' : (next_phase, "Advance the next phase of play"),
-    'quit' : (quit_game, "Quits out of the game. No savesies, though!")
+    'quit' : (quitGame, "Quits out of the game. No savesies, though!")
 }
 
 phase_commands = {
